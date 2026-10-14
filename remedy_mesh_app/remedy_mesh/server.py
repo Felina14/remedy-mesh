@@ -676,9 +676,71 @@ async def api_dev_seed(case_id: str = "CASE-001"):
 
 
 # ----------------------------------------------------------------- real call + webhook
+# ---- scripted (demo) call mode -------------------------------------------------
+# For recording a clean demo video without depending on a live phone call / live
+# speech: when REMEDY_DEMO_CALL is set, a "Call to confirm" click plays a SCRIPTED
+# conversation into the call drawer with realistic pacing, then routes the outcome
+# through the SAME _finalize_call_outcome path as a real call (so the PO draft /
+# decline re-source / Part 573 flows are 100% the real app). Off by default, so
+# production (Cloud Run) always places real Twilio calls.
+DEMO_CALL = bool(os.environ.get("REMEDY_DEMO_CALL"))
+_DEMO_DECLINE = {s.strip() for s in os.environ.get("REMEDY_DEMO_DECLINE", "SUP_B").split(",") if s.strip()}
+_DEMO_TURN_GAP = float(os.environ.get("REMEDY_DEMO_TURN_GAP", "3.0"))  # seconds between spoken turns
+
+
+def _demo_script(sup: str, sup_name: str, qty: int, price: float, wk: int, oem_name: str, decline: bool):
+    opening = (f"Agent → {sup}",
+               f"Hello, this is {oem_name} sourcing, calling about recall remedy procurement for the "
+               f"integrated brake module. We'd like to place an order of {qty:,} units at ${price:,.2f} "
+               f"per unit, delivered within {wk} weeks. Is {sup_name} able to commit?")
+    if decline:
+        turns = [
+            (f"{sup} (supplier)", f"Let me check our schedule… I'm sorry, at ${price:,.2f} we can't hold the "
+                                  f"{wk}-week window right now — our line is backlogged. We'd have to push delivery.", ""),
+            (f"Agent → {sup}", f"Understood. So {sup_name} can't commit to the {wk}-week window at those terms?", ""),
+            (f"{sup} (supplier)", "That's right — not at this time.", ""),
+            (f"Agent → {sup}", "Thank you for your time. We'll re-source the balance to another supplier.", "declined"),
+        ]
+    else:
+        turns = [
+            (f"{sup} (supplier)", f"Let me pull up our capacity… yes, we can cover {qty:,} units in that "
+                                  f"window at ${price:,.2f}.", ""),
+            (f"Agent → {sup}", f"Excellent. To confirm on the record — {qty:,} units at ${price:,.2f} each, "
+                               f"delivered within {wk} weeks.", ""),
+            (f"{sup} (supplier)", "Confirmed.", ""),
+            (f"Agent → {sup}", "Thank you. We'll draft the purchase order and send it over for signature now.", "confirmed"),
+        ]
+    return opening, turns
+
+
+async def _demo_call_play(case_id: str, commitment_id: str, row, sup_name: str, qty: int, price: float, wk: int, oem_name: str):
+    """Append the scripted conversation turn-by-turn (with pacing), then finalize —
+    exactly the events the call drawer and PO flow expect from a real call."""
+    sup = row.supplier_id
+    decline = sup in _DEMO_DECLINE
+    opening, turns = _demo_script(sup, sup_name, qty, price, wk, oem_name, decline)
+    conv = CALL_CONVOS.setdefault(commitment_id, {"order": {}, "history": []})
+
+    def log(actor, text, outcome=""):
+        tl = TIMELINES.setdefault(case_id, [])
+        tl.append({"seq": len(tl) + 1, "phase": "call", "actor": actor, "text": text,
+                   "outcome": outcome, "meta": {"mode": "twilio", "transcript": True}})
+
+    conv["history"].append({"actor": "Agent", "text": opening[1]})
+    for actor, text, outcome in turns:
+        await asyncio.sleep(_DEMO_TURN_GAP)
+        log(actor, text, outcome)
+        conv["history"].append({"actor": "Agent" if actor.lower().startswith("agent") else sup, "text": text})
+    await asyncio.sleep(1.2)
+    await _finalize_call_outcome(commitment_id, {
+        "outcome": "declined" if decline else "confirmed",
+        "agreed_quantity": row.quantity, "agreed_price": row.unit_price, "done": True})
+
+
 @app.post("/api/call/{case_id}/{commitment_id}")
 async def api_call(case_id: str, commitment_id: str, request: Request):
-    """Place a REAL Twilio confirmation call for one commitment."""
+    """Place a confirmation call for one commitment — a REAL Twilio call, or (when
+    REMEDY_DEMO_CALL is set) a scripted conversation for recording a demo video."""
     ledger = LEDGERS.get(case_id)
     row = ledger.rows.get(commitment_id) if ledger else None
     if not row:
@@ -693,10 +755,19 @@ async def api_call(case_id: str, commitment_id: str, request: Request):
         "order": {"quantity": row.quantity, "unit_price": row.unit_price, "deadline_weeks": oem["deadline_weeks"]},
         "history": [],
     }
+    tl = TIMELINES.setdefault(case_id, [])
+    if DEMO_CALL:
+        sup_name = _supplier(row.supplier_id).get("party_name", row.supplier_id)
+        opening, _ = _demo_script(row.supplier_id, sup_name, int(row.quantity), float(row.unit_price),
+                                  oem["deadline_weeks"], oem_name, row.supplier_id in _DEMO_DECLINE)
+        tl.append({"seq": len(tl) + 1, "phase": "call", "actor": opening[0], "text": opening[1],
+                   "outcome": "ringing", "meta": {"mode": "twilio"}})
+        asyncio.create_task(_demo_call_play(case_id, commitment_id, row, sup_name,
+                                            int(row.quantity), float(row.unit_price), oem["deadline_weeks"], oem_name))
+        return {"outcome": "ringing", "mode": "twilio", "spoken": opening[1]}
     webhook = f"{_base_url(request)}/voice/{commitment_id}"
     outcome = voice.call_supplier(row.supplier_id, row.quantity, row.unit_price,
                                   oem["deadline_weeks"], webhook_url=webhook, oem=oem_name)
-    tl = TIMELINES.setdefault(case_id, [])
     tl.append({"seq": len(tl) + 1, "phase": "call", "actor": "Agent → " + row.supplier_id,
                "text": outcome["spoken"], "outcome": outcome["outcome"], "meta": {"mode": outcome["mode"]}})
     return outcome
