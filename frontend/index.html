@@ -1,0 +1,1521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Remedy Mesh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script>try{var _t=localStorage.getItem("rm-theme");if(_t==="dark"||_t==="light")document.documentElement.setAttribute("data-theme",_t);}catch(e){}</script>
+<style>
+  :root{
+    --bg:#f7f8fa; --panel:#ffffff; --panel-2:#fbfbfd;
+    --ink:#14161c; --ink-2:#4e5563; --ink-3:#848b98;
+    --line:#e9ebef; --line-2:#dfe2e8;
+    --accent:#2b5bff; --accent-ink:#1f49e0; --accent-wash:#eef2ff;
+    --ok:var(--accent); --ok-wash:var(--accent-wash);
+    --amber:var(--ink-3); --amber-wash:var(--mut);
+    --violet:var(--ink-3); --violet-wash:var(--mut);
+    --rose:#d23b43; --rose-wash:#fbe9ea;
+    --shadow:0 1px 2px rgba(20,22,28,.04), 0 6px 20px rgba(20,22,28,.05);
+    --shadow-lift:0 2px 6px rgba(20,22,28,.06), 0 16px 40px rgba(20,22,28,.08);
+    --sans:"Schibsted Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --r:16px; --r-sm:11px;
+    /* top bar — follows the theme instead of a fixed black strip */
+    --tb-bg:#ffffff; --tb-track:#eef0f4; --tb-active:#ffffff; --scrim:rgba(17,19,25,.42);
+    --mut:#eff1f5;
+  }
+  /* ---- dark theme: redefine the tokens; most components use them, so they adapt ---- */
+  :root[data-theme="dark"],
+  :root:not([data-theme="light"]){ /* placeholder so the media query below can narrow */ }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --bg:#0e1015; --panel:#161922; --panel-2:#1c212c;
+    --ink:#e9ebf1; --ink-2:#a7adbb; --ink-3:#6f7584;
+    --line:#272c38; --line-2:#333a48;
+    --accent:#5b82ff; --accent-ink:#9db4ff; --accent-wash:#1a2546;
+    --ok:var(--accent); --ok-wash:var(--accent-wash); --amber:var(--ink-3); --amber-wash:var(--mut);
+    --violet:var(--ink-3); --violet-wash:var(--mut); --rose:#f26b73; --rose-wash:#2d171a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+    --shadow-lift:0 2px 8px rgba(0,0,0,.45),0 20px 48px rgba(0,0,0,.5);
+    --tb-bg:#12151c; --tb-track:rgba(255,255,255,.05); --tb-active:rgba(255,255,255,.1);
+    --scrim:rgba(0,0,0,.6); --mut:#232834;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#0e1015; --panel:#161922; --panel-2:#1c212c;
+    --ink:#e9ebf1; --ink-2:#a7adbb; --ink-3:#6f7584;
+    --line:#272c38; --line-2:#333a48;
+    --accent:#5b82ff; --accent-ink:#9db4ff; --accent-wash:#1a2546;
+    --ok:var(--accent); --ok-wash:var(--accent-wash); --amber:var(--ink-3); --amber-wash:var(--mut);
+    --violet:var(--ink-3); --violet-wash:var(--mut); --rose:#f26b73; --rose-wash:#2d171a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+    --shadow-lift:0 2px 8px rgba(0,0,0,.45),0 20px 48px rgba(0,0,0,.5);
+    --tb-bg:#12151c; --tb-track:rgba(255,255,255,.05); --tb-active:rgba(255,255,255,.1);
+    --scrim:rgba(0,0,0,.6); --mut:#232834;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv01";}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  ::selection{background:rgba(43,91,255,.16)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+  /* scrollable, but the scrollbar is hidden everywhere */
+  *{scrollbar-width:none;-ms-overflow-style:none}
+  ::-webkit-scrollbar{width:0;height:0;display:none}
+
+  /* top bar — a dark console strip gives the product an identity of its own.
+     Inner content is width-matched to the page so the brand lines up with the
+     page's left edge and the status with its right edge. */
+  .top{position:sticky;top:0;z-index:20;background:var(--tb-bg);border-bottom:1px solid var(--line);color:var(--ink)}
+  .topin{max-width:1520px;margin:0 auto;padding:12px 52px;display:flex;align-items:center;gap:20px}
+  .brand{display:inline-flex;align-items:center;gap:11px;color:var(--ink);text-decoration:none}
+  .mark{width:30px;height:30px;flex:none;display:inline-flex;border-radius:9px;box-shadow:0 2px 8px rgba(43,91,255,.38),inset 0 1px 0 rgba(255,255,255,.25)}
+  .mark svg{width:30px;height:30px}
+  .wordwrap{display:flex;flex-direction:column;line-height:1.05}
+  .word{font-weight:600;font-size:15.5px;letter-spacing:-.02em;color:var(--ink)}
+  .sub{font-size:10.5px;color:var(--ink-3);letter-spacing:.02em;margin-top:1px}
+
+  /* segmented nav control — theme-aware */
+  .tnav{display:flex;align-items:center;gap:3px;margin-left:8px;background:var(--tb-track);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .tlink{display:inline-flex;align-items:center;gap:7px;color:var(--ink-3);text-decoration:none;font-size:13.5px;font-weight:500;padding:7px 15px;border-radius:999px;transition:background .15s,color .15s}
+  .tlink:hover{color:var(--ink-2)}
+  .tlink.active{color:var(--ink);background:var(--tb-active);box-shadow:var(--shadow)}
+  .tlink .badge{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;font-family:var(--mono);display:inline-flex;align-items:center;justify-content:center;line-height:1}
+  .status{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);background:var(--tb-track);border:1px solid var(--line);padding:6px 13px;border-radius:999px}
+  .pip{width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+  .pip.on{background:var(--ok);box-shadow:0 0 0 3px rgba(10,143,92,.28)} .pip.off{background:var(--rose);box-shadow:0 0 0 3px rgba(210,59,67,.28)}
+  /* theme toggle */
+  .themebtn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:none;border:1px solid var(--line);background:var(--tb-track);color:var(--ink-2);border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
+  .themebtn:hover{color:var(--ink);background:var(--panel-2)}
+  .themebtn svg{width:17px;height:17px}
+  .themebtn .moon{display:none} .themebtn .sun{display:block}
+  :root[data-theme="dark"] .themebtn .moon{display:block} :root[data-theme="dark"] .themebtn .sun{display:none}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .themebtn .moon{display:block} :root:not([data-theme="light"]) .themebtn .sun{display:none} }
+
+  .page{max-width:1520px;margin:0 auto;padding:72px 52px 120px}
+
+  /* hero heading */
+  .lede h1{font-size:clamp(32px,4.4vw,46px);font-weight:600;letter-spacing:-.03em;line-height:1.04}
+  .lede p{color:var(--ink-2);font-size:17px;margin-top:16px;max-width:60ch}
+
+  /* metrics — the lead tile is sized and lit to actually dominate; the other
+     three are deliberately quieter so "2 need action" doesn't read as equal
+     to "24 no signal" */
+  .metrics{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:16px;margin-top:44px}
+  .metric{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow)}
+  .metric .n{font-size:40px;font-weight:600;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+  .metric .l{color:var(--ink-2);font-size:14px;margin-top:12px}
+  .metric .l b{color:var(--ink);font-weight:500}
+  .metric.lead{background:linear-gradient(165deg,var(--accent-wash),var(--panel) 72%);border-color:var(--accent-wash);box-shadow:var(--shadow-lift)}
+  .metric.lead .n{color:var(--accent-ink);font-size:clamp(48px,6vw,68px)}
+  .metric.lead .tag{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--accent-ink);background:var(--panel);border:1px solid var(--line-2);padding:4px 10px;border-radius:999px;margin-bottom:16px}
+  .metric.lead .tag em{width:7px;height:7px;border-radius:50%;background:var(--accent);font-style:normal;animation:pulse 2.2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(43,91,255,.5)}70%{box-shadow:0 0 0 9px rgba(43,91,255,0)}100%{box-shadow:0 0 0 0 rgba(43,91,255,0)}}
+  .metric .n.ambr{color:var(--accent-ink)} .metric .n.mut{color:var(--ink-3)} .metric .n.drift{color:var(--accent-ink)}
+  /* critical lead — the case the system actively solves (supplier negotiation) */
+  .metric.lead.critical{background:linear-gradient(165deg,var(--rose-wash),var(--panel) 72%);border-color:var(--rose-wash)}
+  .metric.lead.critical .n{color:var(--rose)}
+  .metric.lead.critical .tag{color:var(--rose);border-color:var(--rose-wash)}
+  .metric.lead.critical .tag em{background:var(--rose)}
+
+  /* distribution */
+  .dist{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow)}
+  .dist h2{font-size:13px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+  .dist .bar{display:flex;height:12px;border-radius:999px;overflow:hidden;margin-top:16px;background:#eef0f4;gap:2px}
+  .dist .bar i{display:block;border-radius:2px;width:0;transition:width 1s cubic-bezier(.16,1,.3,1)}
+  .dist .leg{display:flex;flex-wrap:wrap;gap:22px;margin-top:16px}
+  .dist .leg span{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+  .dist .leg b{color:var(--ink);font-weight:500;font-family:var(--mono)}
+  .dist .leg em{width:9px;height:9px;border-radius:3px;font-style:normal}
+
+  /* case list */
+  .cases{margin-top:52px}
+  .cases .hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;gap:16px;flex-wrap:wrap}
+  .cases .hd h2{font-size:20px;font-weight:600;letter-spacing:-.02em}
+  .cases .hd span{color:var(--ink-3);font-size:13.5px}
+  .list{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+  .row{display:grid;grid-template-columns:132px 1fr 170px 130px 24px;align-items:center;gap:18px;padding:18px 24px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
+  .row:last-child{border-bottom:none}
+  .row:hover{background:var(--panel-2)}
+  .row .id{font-family:var(--mono);font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+  /* criticality: a left severity rail + a Critical/High/Medium chip */
+  .row.crit-critical{box-shadow:inset 3px 0 0 var(--rose)}
+  .row.crit-high{box-shadow:inset 3px 0 0 var(--accent)}
+  .row.crit-medium{box-shadow:inset 3px 0 0 var(--ink-3)}
+  .critchip{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:5px;line-height:1.3}
+  .critchip.critical{background:var(--rose-wash);color:var(--rose)}
+  .critchip.high{background:var(--accent-wash);color:var(--accent-ink)}
+  .critchip.medium{background:var(--mut);color:var(--ink-3)}
+  .row .cmp{font-weight:500;letter-spacing:-.01em}
+  .row .cmp small{display:block;color:var(--ink-3);font-weight:400;font-size:13px;margin-top:1px;font-family:var(--sans)}
+  .row .num{font-family:var(--mono);font-size:13px;color:var(--ink-3);text-align:right}
+  .row .chev{color:var(--line-2);transition:transform .15s,color .15s;justify-self:end}
+  .row:hover .chev{color:var(--ink-2);transform:translateX(3px)}
+  .hero-pill{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-wash);border-radius:5px;padding:2px 6px}
+
+  .cleared-toggle{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink-3);font-size:13.5px;cursor:pointer;transition:background .15s,color .15s}
+  .cleared-toggle:hover{background:var(--panel-2);color:var(--ink-2)}
+  .cleared-toggle svg{transition:transform .2s;transform:rotate(90deg)}
+  .cleared-toggle.open svg{transform:rotate(-90deg)}
+  #clearedList{margin-top:12px}
+
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;padding:5px 11px;border-radius:999px}
+  .pill em{width:7px;height:7px;border-radius:50%;font-style:normal}
+  .pill.accent{background:var(--accent-wash);color:var(--accent-ink)} .pill.accent em{background:var(--accent)}
+  .pill.ok{background:var(--ok-wash);color:var(--ok)} .pill.ok em{background:var(--ok)}
+  .pill.amber{background:var(--amber-wash);color:var(--amber)} .pill.amber em{background:var(--amber)}
+  .pill.violet{background:var(--violet-wash);color:var(--violet)} .pill.violet em{background:var(--violet)}
+  .pill.mut{background:var(--mut);color:var(--ink-3)} .pill.mut em{background:var(--ink-3)}
+  .pill.rose{background:var(--rose-wash);color:var(--rose)} .pill.rose em{background:var(--rose)}
+
+  /* entrance motion — one authored moment */
+  .rise{opacity:0;transform:translateY(14px)}
+  .rise.in{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+  @media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}}
+
+  /* case view */
+  .back{display:inline-flex;align-items:center;gap:8px;color:var(--ink-2);font-size:14px;cursor:pointer;margin-bottom:28px}
+  .back:hover{color:var(--ink)}
+  .chd{display:flex;align-items:baseline;gap:18px;margin-bottom:8px;flex-wrap:wrap}
+  .chd h1{font-size:28px;font-weight:600;letter-spacing:-.02em}
+  .timer{display:inline-flex;align-items:center;gap:7px;color:var(--ink-3);font-size:13px}
+  .timer .tdot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1.1s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  .loadwrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:70px 20px;text-align:center;color:var(--ink-3);font-size:14px}
+  .ring{width:34px;height:34px;border-radius:50%;border:3px solid var(--line-2);border-top-color:var(--accent);animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* live agent feed — the actual "wow" moment: every step renders the instant
+     it happens over SSE, grouped by phase, so a 20–30s negotiation reads as
+     agents visibly working rather than a stalled spinner */
+  .feed{display:flex;flex-direction:column;gap:2px;margin-top:28px}
+  .psec{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow);margin-top:20px}
+  .psec:first-child{margin-top:0}
+  .phead{position:sticky;top:59px;z-index:5;display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--panel-2);border-bottom:1px solid var(--line);border-radius:10px 10px 0 0}
+  .phead svg{width:18px;height:18px;flex:none;color:var(--ink-3)}
+  .phead .ptext{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .phead .ptitle{font-weight:600;font-size:13.5px;color:var(--ink)}
+  .phead .psub{font-size:12px;color:var(--ink-2);line-height:1.4}
+  .psec.p-gate .phead{background:var(--accent-wash)}
+  .psec.p-gate .phead svg{color:var(--accent-ink)}
+  .psec.p-l2 .phead{background:var(--violet-wash)}
+  .psec.p-l2 .phead svg{color:var(--violet)}
+  .psec.p-call .phead{background:var(--rose-wash)}
+  .psec.p-call .phead svg{color:var(--rose)}
+  .psec.p-ledger .phead{background:var(--ok-wash)}
+  .psec.p-ledger .phead svg{color:var(--ok)}
+  .psec.p-resolution .phead{background:var(--amber-wash)}
+  .psec.p-resolution .phead svg{color:var(--amber)}
+  .plines{display:flex;flex-direction:column;gap:2px;padding:6px}
+  .fline{display:flex;gap:12px;padding:9px 10px;border-radius:10px;transition:background .15s;opacity:0;transform:translateY(6px)}
+  .fline.in{opacity:1;transform:none;transition:opacity .4s ease,transform .4s ease}
+  .fline:hover{background:var(--panel-2)}
+  .fdot{width:8px;height:8px;border-radius:50%;margin-top:7px;flex:none;background:var(--ink-3)}
+  .fline.p-gate .fdot{background:var(--accent)}
+  .fline.p-l2 .fdot{background:var(--violet)}
+  .fline.p-call .fdot{background:var(--rose)}
+  .fline.p-ledger .fdot{background:var(--ok)}
+  .fline.p-resolution .fdot{background:var(--amber)}
+  .fline.p-resolved .fdot{background:var(--ok)}
+  .fbody{flex:1;min-width:0}
+  .fhead{display:flex;align-items:baseline;gap:10px;font-size:12.5px}
+  .fhead b{font-weight:600;color:var(--ink)}
+  .fhead .ft{margin-left:auto;color:var(--ink-3);flex:none}
+  .ftext{margin-top:3px;color:var(--ink-2);font-size:14px;line-height:1.5}
+  .foutcome{display:inline-flex;margin-left:2px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;vertical-align:middle;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+  .foutcome.ok{background:var(--ok-wash);color:var(--ok)}
+  .foutcome.rose{background:var(--rose-wash);color:var(--rose)}
+  .foutcome.accent{background:var(--accent-wash);color:var(--accent-ink)}
+  .foutcome.mut{background:var(--mut);color:var(--ink-3)}
+
+  /* layer2 bids get pulled out as a highlighted chip so the negotiation reads
+     like numbers actually moving, not just prose */
+  .fbid{display:inline-block;font-family:var(--mono);font-weight:600;color:var(--violet);background:var(--violet-wash);padding:1px 8px;border-radius:7px}
+
+  /* evidence checklist — the actual criteria behind a layer-1 verdict, so a judge
+     sees what was checked, not just the one-line conclusion */
+  .evbox{margin-top:8px;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:7px 16px}
+  .evrow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2)}
+  .evrow .evmark{width:15px;height:15px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+  .evrow .evmark.y{background:var(--ok-wash);color:var(--ok)} .evrow .evmark.n{background:var(--mut);color:var(--ink-3)}
+  .evmetrics{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line-2)}
+  .evmetrics span{font-size:12px;color:var(--ink-3)} .evmetrics b{font-family:var(--mono);color:var(--ink);font-weight:500}
+
+  /* the OEM's actual reasoning for a counter — the agent's own words, not just a
+     one-line "countered at $X" summary */
+  .reason{margin-top:7px;padding:10px 14px;background:var(--violet-wash);border-radius:10px;font-size:13.5px;color:var(--ink);font-style:italic;line-height:1.5}
+  .reason::before{content:"\201C";font-style:normal;color:var(--violet);font-weight:700;margin-right:2px}
+  .reasonmeta{margin-top:5px;font-size:11.5px;color:var(--ink-3);font-style:normal}
+
+  .stance{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .stance.propose{background:var(--mut);color:var(--ink-3)}
+  .stance.counter{background:var(--amber-wash);color:var(--amber)}
+  .stance.accept{background:var(--ok-wash);color:var(--ok)}
+
+  .foutcome.rate_limited{background:var(--amber-wash);color:var(--amber)}
+  .foutcome.thinking{background:var(--accent-wash);color:var(--accent-ink)}
+  .fline.thinking{opacity:.75}
+  /* a rate-limit retry is a transient system note, not a negotiation step — mute it */
+  .fline.sysnote{opacity:.62}
+  .fline.sysnote .fhead b{font-weight:600;color:var(--mut)}
+  .fline.sysnote .ftext{font-style:italic;font-size:12.5px}
+  /* recovery / interrupted-run banner */
+  .runnote{margin:14px 0;padding:16px 18px;border-radius:12px;border:1px solid var(--line);background:var(--panel)}
+  .runnote.warn{border-color:color-mix(in srgb,var(--amber) 40%,var(--line));background:var(--amber-wash)}
+  .runnote .rn-title{font-weight:700;font-size:14px;color:var(--amber);margin-bottom:4px}
+  .runnote .rn-body{font-size:13px;color:var(--ink-2);line-height:1.5;margin-bottom:12px}
+
+  /* ---- sign-in (centered card) ---- */
+  .authwrap{position:relative;overflow:hidden;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+  .authwrap::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(620px 420px at 50% -6%, color-mix(in srgb,var(--accent) 16%, transparent), transparent 60%)}
+  .auth-card{position:relative;z-index:1;width:100%;max-width:400px}
+  .auth-brand{display:inline-flex;align-items:center;gap:13px;margin-bottom:30px}
+  .auth-brand .mk{width:44px;height:44px;flex:none;border-radius:13px;box-shadow:0 12px 30px rgba(43,91,255,.3)}
+  .auth-brand .nm{font-size:18px;font-weight:720;letter-spacing:-.01em;line-height:1.14}
+  .auth-brand .og{font-size:12.5px;color:var(--ink-2)}
+  .auth-card h2{font-size:27px;font-weight:730;letter-spacing:-.02em;margin:0 0 6px}
+  .auth-card .ac-sub{font-size:14px;color:var(--ink-2);margin:0 0 26px;line-height:1.5}
+  .auth-field{margin-bottom:16px}
+  .auth-field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px}
+  .auth-input{width:100%;padding:12px 14px;font:inherit;font-size:14.5px;color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:11px;outline:none;transition:border-color .15s,box-shadow .15s}
+  .auth-input::placeholder{color:var(--mut)}
+  .auth-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%, transparent)}
+  .auth-card .btn.primary{width:100%;margin-top:8px;padding:13px;font-size:15px}
+  .auth-err{color:var(--rose);font-size:13px;margin-top:12px;min-height:1.1em}
+  .auth-demo{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-2);line-height:1.9}
+  .auth-demo .dl{font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:10.5px;color:var(--mut);display:block;margin-bottom:5px}
+  .auth-demo code{font-family:var(--mono);font-size:11.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  @media(max-width:480px){ .auth-card h2{font-size:24px} }
+
+  /* ---- Layer 2 negotiation mesh (parallel supplier lanes → OEM node) ---- */
+  .mesh{padding:2px}
+  .mesh-note{font-size:12.5px;color:var(--ink-2);line-height:1.5;margin:0 2px 16px;max-width:62ch}
+  .mesh-note b{color:var(--ink);font-weight:600}
+  .mesh-lanes{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(170px,1fr);gap:14px}
+  .mlane{position:relative;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px 13px 14px;transition:border-color .35s,box-shadow .35s}
+  .mlane.won{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 28%,transparent),0 12px 28px -16px var(--accent)}
+  .mlane-hd{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:650;margin-bottom:10px;line-height:1.2}
+  .mlane-hd small{font-family:var(--mono);font-size:10px;color:var(--mut);font-weight:500;margin-left:auto}
+  .mlane .mdot{width:8px;height:8px;border-radius:50%;background:var(--line-2);flex:none}
+  .mlane.thinking .mdot{background:var(--accent);animation:apulse 1.1s ease-in-out infinite}
+  .mlane.won .mdot{background:var(--accent)}
+  .mstep{font-size:12.5px;color:var(--ink-2);padding:7px 0;border-top:1px dashed var(--line);display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+  .mstep:first-child{border-top:none}
+  .mstep .lbl{color:var(--ink-3);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;min-width:78px}
+  .mstep b{color:var(--ink);font-weight:650;font-family:var(--mono);font-size:13px}
+  .mstep .q{color:var(--ink-2);font-size:11px}
+  .mstep.counter b{color:var(--accent-ink)}
+  .mstep .rtn{flex-basis:100%;color:var(--mut);font-size:11px;font-style:italic;line-height:1.4;margin-top:1px}
+  .mstep .stance{margin-left:auto;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:5px}
+  .mstep .stance.accept{background:var(--ok-wash);color:var(--ok)}
+  .mstep .stance.reject{background:var(--rose-wash);color:var(--rose)}
+  .mlane .retrychip{display:inline-block;margin-top:8px;font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-wash);border-radius:5px;padding:2px 7px}
+  .mlane::after{content:"";position:absolute;left:50%;bottom:-15px;width:2px;height:15px;background:var(--line-2);transition:background .35s}
+  .mlane.won::after{background:var(--accent)}
+  .mesh-bus{height:2px;background:var(--line);margin-top:15px;position:relative;border-radius:2px}
+  .mesh-bus::after{content:"";position:absolute;left:50%;top:0;width:2px;height:17px;background:var(--accent)}
+  .mesh-oem{display:flex;justify-content:center;margin-top:17px}
+  .oem-node{min-width:260px;max-width:480px;background:var(--panel);border:1px solid color-mix(in srgb,var(--accent) 38%,var(--line));border-radius:14px;padding:12px 18px;text-align:center;transition:box-shadow .35s}
+  .oem-node.active{box-shadow:0 12px 32px -18px var(--accent)}
+  .oem-hd{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--accent-ink)}
+  .oem-hd svg{width:16px;height:16px}
+  .oem-line{font-size:12px;color:var(--ink-2);margin-top:6px;line-height:1.45}
+  .oem-alloc{font-size:13px;color:var(--ink);font-weight:600;margin-top:7px}
+  .oem-alloc .mono{font-family:var(--mono)}
+  @media(max-width:560px){ .mesh-lanes{grid-auto-columns:minmax(140px,1fr)} }
+  .ftext.think{font-style:italic;color:var(--ink-3)}
+  @keyframes apulse{0%,100%{box-shadow:0 0 0 0 rgba(43,91,255,.35)}50%{box-shadow:0 0 0 5px rgba(43,91,255,0)}}
+  @keyframes apulse-amber{0%,100%{box-shadow:0 0 0 0 rgba(154,106,0,.35)}50%{box-shadow:0 0 0 5px rgba(154,106,0,0)}}
+  .fdot.thinking{background:var(--accent);animation:apulse 1.1s ease-in-out infinite}
+  .caselayout{display:grid;grid-template-columns:1fr 290px;gap:22px;align-items:start}
+  @media (max-width:980px){ .caselayout{grid-template-columns:1fr} .agents{position:static;max-height:none} }
+  .agents{position:sticky;top:75px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow);padding:14px;max-height:calc(100vh - 100px);overflow:auto}
+  .agents h3{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px;padding:0 6px}
+  .arow{display:flex;gap:10px;padding:8px 6px;border-radius:8px;align-items:flex-start}
+  .arow:hover{background:var(--panel-2)}
+  .adot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none;background:var(--ink-3)}
+  .adot.ok{background:var(--ok)}
+  .adot.rose{background:var(--rose)}
+  .adot.accent{background:var(--accent)}
+  .adot.mut{background:var(--ink-3)}
+  .adot.rate_limited{background:var(--amber);animation:apulse-amber 1.1s ease-in-out infinite}
+  .adot.thinking{background:var(--accent);animation:apulse 1.1s ease-in-out infinite}
+  .abody{flex:1;min-width:0}
+  .aname{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .atext{font-size:12px;color:var(--ink-2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ats{font-size:10.5px;color:var(--ink-3);flex:none;padding-top:2px}
+
+  /* the call phase renders as an actual two-sided transcript (agent left,
+     supplier right) instead of a generic feed line — this is the one moment
+     meant to feel like listening in on the call */
+  .crow{display:flex;margin:10px 0;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}
+  .crow.in{opacity:1;transform:none}
+  .crow.sup{justify-content:flex-end;text-align:right}
+  .cwrap{max-width:640px}
+  .cwho{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink-3);margin-bottom:5px}
+  .crow.sup .cwho{justify-content:flex-end}
+  .cwho svg{width:12px;height:12px;flex:none;opacity:.7}
+  .cmode{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:999px}
+  .cmode.simulated{background:var(--mut);color:var(--ink-3)}
+  .cmode.twilio{background:var(--ok-wash);color:var(--ok)}
+  .cbub{display:inline-block;padding:11px 16px;border-radius:14px;font-size:14px;line-height:1.5}
+  .cbub.agent{background:var(--accent-wash);color:var(--ink);border-bottom-left-radius:4px}
+  .cbub.sup{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-bottom-right-radius:4px}
+
+  .verdict{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:28px 30px;box-shadow:var(--shadow);margin-top:30px}
+  .verdict.ok{border-color:#bfe8d4;background:linear-gradient(120deg,var(--ok-wash),var(--panel) 62%)}
+  .verdict .vv{font-size:24px;font-weight:600;letter-spacing:-.02em}
+  .verdict .vm{display:flex;flex-wrap:wrap;gap:34px;margin-top:20px}
+  .verdict .vm div{color:var(--ink-2);font-size:13px}
+  .verdict .vm b{display:block;font-family:var(--mono);font-size:22px;color:var(--ink);font-weight:500;margin-top:3px}
+
+  .alloc{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+  .alloc h3{font-size:13px;font-weight:600;color:var(--ink-2);padding:20px 22px 0}
+  .alloc table{width:100%;border-collapse:collapse;margin-top:14px}
+  .alloc th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);padding:10px 22px;border-top:1px solid var(--line)}
+  .alloc td{padding:13px 22px;font-size:13.5px;border-top:1px solid var(--line)}
+  .alloc td.num{font-family:var(--mono);text-align:right}
+  .err{background:var(--rose-wash);color:var(--rose);border:1px solid var(--line-2);border-radius:var(--r);padding:20px 24px;margin-top:20px;font-size:14px}
+
+  /* in-case resolve card (non-sourcing tags) + resolved state */
+  .resolve-card{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 24px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .resolve-card .rc-body{flex:1;min-width:260px}
+  .rc-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+  .rc-action{font-size:15.5px;color:var(--ink);margin-top:7px;line-height:1.5;font-weight:500}
+  .rc-owner{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12.5px;color:var(--ink-2)}
+  .rc-owner em{width:6px;height:6px;border-radius:50%;background:var(--amber);font-style:normal}
+  .resolve-card.done{border-color:var(--ok);background:linear-gradient(120deg,var(--ok-wash),var(--panel) 68%)}
+  .resolve-card .sentmark{font-size:15px}
+
+  /* resolved tab */
+  .rcard{display:grid;grid-template-columns:4px 1fr auto;align-items:center;gap:18px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 22px 18px 18px;margin-bottom:12px;cursor:pointer;transition:box-shadow .18s,transform .18s}
+  .rcard:hover{box-shadow:var(--shadow-lift);transform:translateY(-1px)}
+  .rcard .rspine{grid-row:1;width:4px;min-height:40px;border-radius:999px;background:var(--ok);align-self:stretch}
+  .rcard .rtitle{font-weight:600;letter-spacing:-.01em}
+  .rcard .rtitle small{color:var(--ink-3);font-weight:400;margin-left:8px}
+  .rcard .rmeta{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:12.5px;margin-top:5px}
+  .rcard .rmeta .mono{font-size:11.5px}
+  .rcard .raction{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2);white-space:nowrap}
+  .rcard .raction svg{width:15px;height:15px;color:var(--ok)}
+  /* static audit timeline reuses the feed styles; just ensure it animates in */
+  .audit-head{display:flex;flex-wrap:wrap;gap:16px 28px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px 24px;margin-top:20px}
+  .audit-head div{font-size:12px;color:var(--ink-3)}
+  .audit-head b{display:block;font-size:14px;color:var(--ink);font-weight:600;margin-top:3px;font-family:var(--sans)}
+  .audit-head b.mono{font-family:var(--mono);font-size:13px}
+
+  /* notifications page */
+  .nhead{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .nsub{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;color:var(--ink-2);font-size:13.5px}
+  .nsub b{font-family:var(--mono);color:var(--ink);font-weight:500}
+  .nsect{margin-top:32px}
+  .nsect > h2{font-size:13px;font-weight:600;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px}
+  .ncard{display:grid;grid-template-columns:4px 42px 1fr auto;align-items:center;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 22px 18px 18px;margin-bottom:12px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s}
+  .ncard:hover{box-shadow:var(--shadow-lift);transform:translateY(-1px)}
+  .ncard:active{transform:translateY(0)}
+  .ncard .nspine{grid-row:1;width:4px;height:100%;min-height:42px;border-radius:999px;align-self:stretch}
+  .ncard.po .nspine{background:var(--accent)} .ncard.rejected .nspine{background:var(--rose)}
+  .ncard.escalation .nspine{background:var(--amber)} .ncard.sent .nspine{background:var(--ok)}
+  .ncard.part573 .nspine{background:var(--rose)}
+  .ncard .nicon{width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center}
+  .ncard .nicon svg{width:20px;height:20px}
+  .ncard.po .nicon{background:var(--accent-wash);color:var(--accent-ink)}
+  .ncard.rejected .nicon{background:var(--rose-wash);color:var(--rose)}
+  .ncard.escalation .nicon{background:var(--amber-wash);color:var(--amber)}
+  .ncard.part573 .nicon{background:var(--rose-wash);color:var(--rose)}
+  .ncard.sent .nicon{background:var(--ok-wash);color:var(--ok)}
+  .ncard .ntitle{font-weight:600;letter-spacing:-.01em;font-size:15px}
+  .ncard .ndetail{color:var(--ink-2);font-size:13.5px;margin-top:3px}
+  .ncard .nmeta{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:12px;margin-top:6px}
+  .ncard .nmeta .mono{font-size:11.5px}
+  .ncard .ncta{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--accent-ink);white-space:nowrap}
+  .ncard .ncta svg{transition:transform .15s}
+  .ncard:hover .ncta svg{transform:translateX(3px)}
+  .ncard.done{cursor:default;opacity:.92}
+  .ncard.done:hover{transform:none;box-shadow:var(--shadow)}
+  .nempty{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:72px 24px;color:var(--ink-3)}
+  .nempty .ei{width:52px;height:52px;border-radius:16px;background:var(--panel);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3);box-shadow:var(--shadow)}
+  .nempty .ei svg{width:24px;height:24px}
+  .nempty h3{font-size:16px;font-weight:600;color:var(--ink-2)}
+
+  /* drawer */
+  .scrim{position:fixed;inset:0;background:var(--scrim);z-index:40;opacity:0;transition:opacity .3s;backdrop-filter:blur(2px)}
+  .scrim.in{opacity:1}
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:min(560px,100vw);background:var(--bg);z-index:41;box-shadow:-20px 0 60px rgba(20,22,28,.18);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .34s cubic-bezier(.16,1,.3,1)}
+  .drawer.in{transform:none}
+  .dhd{display:flex;align-items:center;gap:14px;padding:22px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .dhd .dk{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+  .dhd .dk.po{color:var(--accent-ink)} .dhd .dk.rejected{color:var(--rose)} .dhd .dk.escalation{color:var(--amber)} .dhd .dk.part573{color:var(--rose)} .dhd .dk.sent{color:var(--ok)}
+  .dhd h2{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-top:2px}
+  .dclose{margin-left:auto;width:34px;height:34px;flex:none;border:1px solid var(--line);background:var(--panel);border-radius:10px;color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+  .dclose:hover{background:var(--panel-2);color:var(--ink)}
+  .dbody{flex:1;overflow:auto;padding:22px 24px 28px}
+  .dsum{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-sm);padding:18px 20px;box-shadow:var(--shadow)}
+  .dsum .k{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3)}
+  .dsum .vv{font-size:15px;font-weight:600;margin-top:3px}
+  .dsum .vv.mono{font-family:var(--mono)}
+  .dsum .wide{grid-column:1/-1}
+  .dlabel{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:24px 0 10px}
+  /* in-drawer document preview — an HTML rendering of the PO (the real, emailed
+     artifact is the PDF behind "Open PDF"); keeps the preview crisp and reliable
+     instead of embedding a cross-origin PDF viewer */
+  .podoc{background:#fff;border:1px solid var(--line-2);border-radius:var(--r-sm);box-shadow:var(--shadow);padding:22px 22px 18px;position:relative;overflow:hidden}
+  .podoc .pk{font-size:9.5px;font-weight:700;letter-spacing:.09em;color:var(--accent-ink);text-transform:uppercase}
+  .podoc .pt{font-size:18px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
+  .podoc .prow{display:flex;flex-wrap:wrap;gap:14px 26px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+  .podoc .prow .pc .pl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .podoc .prow .pc .pv{font-size:12.5px;font-weight:600;margin-top:2px}
+  .podoc .prow .pc .pv.mono{font-family:var(--mono)}
+  .podoc .pline{display:grid;grid-template-columns:1fr auto;gap:4px 14px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+  .podoc .pline .pd{font-size:13px;font-weight:500}
+  .podoc .pline .pd small{display:block;color:var(--ink-3);font-weight:400;font-size:11px;margin-top:1px}
+  .podoc .pline .pq{font-family:var(--mono);font-size:12px;color:var(--ink-2);text-align:right;align-self:center}
+  .podoc .ptot{display:flex;align-items:baseline;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .podoc .ptot .tl{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .podoc .ptot .tv{font-size:24px;font-weight:600;letter-spacing:-.02em;font-family:var(--mono)}
+  .podoc .pstamp{margin-top:16px;padding-top:12px;border-top:1px dashed var(--line-2);font-size:11px;color:var(--ink-3);line-height:1.5}
+  .podoc .pstamp b{color:var(--ink-2)}
+  .pdflink{display:inline-flex;align-items:center;gap:7px;margin-top:10px;font-size:13px;color:var(--accent-ink);text-decoration:none;font-weight:500}
+  .pdflink:hover{text-decoration:underline}
+  /* real inline PDF preview */
+  .pdfframe{width:100%;height:460px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:#fff;box-shadow:var(--shadow);display:block}
+  /* editable draft email */
+  .efield{margin-top:14px}
+  .efield > label{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+  .efield input,.efield textarea{width:100%;font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line-2);border-radius:10px;padding:11px 13px;transition:border-color .15s,box-shadow .15s}
+  .efield input:focus,.efield textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  .efield textarea{resize:vertical;min-height:210px;line-height:1.55}
+  .eattach{display:inline-flex;align-items:center;gap:9px;margin-top:12px;padding:11px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;font-size:13px;color:var(--ink-2)}
+  .eattach svg{width:18px;height:18px;color:var(--rose);flex:none}
+  .eattach b{color:var(--ink);font-weight:500}
+  .tscript{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-sm);padding:6px;box-shadow:var(--shadow)}
+  .tturn{display:flex;gap:10px;padding:9px 11px;border-radius:9px}
+  .tturn .tw{font-size:11px;color:var(--ink-3);min-width:62px;flex:none;padding-top:2px}
+  .tturn .tx{font-size:13.5px;color:var(--ink);line-height:1.5}
+  .tturn.agent{background:var(--accent-wash)}
+  .noteband{display:flex;gap:12px;align-items:flex-start;margin-top:18px;padding:14px 16px;border-radius:var(--r-sm);font-size:13.5px;line-height:1.5}
+  .noteband.rejected{background:var(--rose-wash);color:var(--rose)}
+  .noteband.escalation{background:var(--amber-wash);color:var(--amber)}
+  .noteband svg{width:18px;height:18px;flex:none;margin-top:1px}
+  .dfoot{border-top:1px solid var(--line);background:var(--panel);padding:18px 24px;display:flex;align-items:center;gap:14px}
+  .dfoot .fnote{font-size:12px;color:var(--ink-3);line-height:1.4}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--sans);font-size:14.5px;font-weight:600;padding:13px 22px;border-radius:12px;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:transform .12s,box-shadow .18s,background .18s}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 2px 10px rgba(43,91,255,.28)}
+  .btn.primary:hover{background:var(--accent-ink);box-shadow:0 4px 16px rgba(43,91,255,.34)}
+  .btn.primary:disabled{background:var(--ink-3);box-shadow:none;cursor:default;opacity:.7}
+  .btn svg{width:17px;height:17px}
+  /* small call-to-confirm button in the allocation table */
+  .btn.sm{font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:9px;background:var(--accent);color:#fff;border:none;box-shadow:0 1px 4px rgba(43,91,255,.25)}
+  .btn.sm:hover{background:var(--accent-ink)}
+  .btn.sm svg{width:14px;height:14px}
+  .btn.sm.done{background:var(--ok-wash);color:var(--ok);box-shadow:none}
+  .alloc-hint{color:var(--ink-2);font-size:13.5px;padding:0 22px 4px}
+  .alloc td.callcell{text-align:right}
+  .muted-note{color:var(--ink-3);font-size:12.5px}
+  .callstatus{display:flex;align-items:center;gap:10px;background:var(--accent-wash);color:var(--accent-ink);border-radius:var(--r-sm);padding:14px 16px;font-size:14px;line-height:1.45}
+  .callstatus svg{width:18px;height:18px;flex:none}
+  .callstatus.callwarn{background:var(--rose-wash);color:var(--rose)}
+  .confirmed-note{display:inline-flex;align-items:center;gap:6px;color:var(--accent-ink);font-size:12.5px;font-weight:600}
+  .confirmed-note svg{width:15px;height:15px}
+  .declined-note{color:var(--rose);font-size:12.5px;font-weight:600}
+  .backfill-badge{font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:5px;background:var(--accent-wash);color:var(--accent-ink);margin-left:6px}
+  .alloc-escalation{margin:14px 22px 2px;padding:12px 16px;background:var(--rose-wash);color:var(--rose);border-radius:10px;font-size:13px;font-weight:500}
+  .sentmark{display:inline-flex;align-items:center;gap:9px;color:var(--ok);font-weight:600;font-size:14.5px}
+  .sentmark svg{width:19px;height:19px}
+  @media(max-width:620px){ .drawer{width:100vw} .dsum{grid-template-columns:1fr} .pdfframe{height:320px} }
+
+  @media(max-width:860px){
+    .metrics{grid-template-columns:1fr 1fr} .metric.lead{grid-column:1/-1}
+    .row{grid-template-columns:100px 1fr auto;gap:12px} .row .num,.row .chev{display:none}
+    .page{padding:40px 20px 80px} .topin{padding:11px 20px;gap:12px} .sub{display:none}
+    .tlink{padding:7px 12px} .tnav{margin-left:0}
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="topin">
+      <a class="brand" href="#" aria-label="Remedy Mesh — all cases">
+        <span class="mark"><svg viewBox="0 0 24 24" fill="none"><rect x="1.5" y="1.5" width="21" height="21" rx="6.5" fill="#2b5bff"/><path d="M7 12.4l3.3 3.3L17.2 8.6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="wordwrap"><span class="word">Remedy Mesh</span><span class="sub" id="brandOrg">Isar Automobile</span></span>
+      </a>
+      <nav class="tnav" role="tablist">
+        <a href="#" id="navCases" class="tlink">Cases</a>
+        <a href="#/notifications" id="navAlerts" class="tlink">
+          <svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span>Notifications</span><span class="badge" id="navBadge" hidden>0</span>
+        </a>
+        <a href="#/resolved" id="navResolved" class="tlink">Resolved</a>
+      </nav>
+      <span class="status" id="whoBox"></span>
+      <button class="themebtn" id="themeBtn" type="button" aria-label="Toggle theme" title="Toggle light / dark">
+        <svg class="sun" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.3 6.3 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div id="view"></div>
+
+<script>
+const API=(location.hostname==="localhost"||location.hostname==="127.0.0.1")?"http://127.0.0.1:8080":"";
+let AUTH=null;
+try{ AUTH=JSON.parse(localStorage.getItem("rm_auth")||"null"); }catch(e){ AUTH=null; }
+function authHeaders(){ return AUTH?{"Authorization":"Bearer "+AUTH.token}:{}; }
+function signOut(){ AUTH=null; try{localStorage.removeItem("rm_auth");}catch(e){} renderWho(); showLogin(); }
+function renderWho(){
+  const w=document.getElementById("whoBox"); if(!w) return;
+  if(!AUTH){ w.innerHTML=""; return; }
+  w.innerHTML=`<span style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#c7cad3;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);padding:4px 6px 4px 4px;border-radius:999px">
+    <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none">${AUTH.name[0]}</span>
+    <span>${AUTH.name} · ${AUTH.role}</span>
+    <button id="switchUserBtn" title="Switch user" style="background:none;border:none;color:inherit;cursor:pointer;opacity:.65;font-size:14px;padding:0 2px;line-height:1">&#8646;</button>
+  </span>`;
+  const sb=document.getElementById("switchUserBtn"); if(sb) sb.onclick=signOut;
+}
+function setChrome(){
+  // The sign-in screen is a dedicated full-screen auth surface with its own branding —
+  // hide the whole app top bar (nav + brand + who-box) so there's no duplicate chrome.
+  const top=document.querySelector(".top"); if(top) top.style.display=AUTH?"":"none";
+}
+function showLogin(){
+  setChrome();
+  const v=document.getElementById("view");
+  const mark=`<svg class="mk" viewBox="0 0 24 24" fill="none"><rect x="1.5" y="1.5" width="21" height="21" rx="6.5" fill="#2b5bff"/><path d="M7 12.4l3.3 3.3L17.2 8.6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  v.innerHTML=`<div class="authwrap">
+    <div class="auth-card rise in">
+      <div class="auth-brand">${mark}<span><div class="nm">Remedy Mesh</div><div class="og">Isar Automobile · Recall Operations</div></span></div>
+      <h2>Sign in</h2>
+      <p class="ac-sub">Enter your operator credentials to continue.</p>
+      <div class="auth-field"><label for="loginUser">Username</label>
+        <input id="loginUser" class="auth-input" autocomplete="username" placeholder="eleanor or james"></div>
+      <div class="auth-field"><label for="loginPass">Password</label>
+        <input id="loginPass" class="auth-input" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+      <button class="btn primary" id="loginBtn">Sign in</button>
+      <div id="loginErr" class="auth-err"></div>
+      <div class="auth-demo">
+        <span class="dl">Demo credentials</span>
+        Analyst — <code>eleanor</code> / <code>analyst123</code><br>
+        Approver — <code>james</code> / <code>approve123</code>
+      </div>
+    </div>
+  </div>`;
+  animateIn(v);
+  document.getElementById("loginBtn").onclick=doLogin;
+  const uEl=document.getElementById("loginUser");
+  document.getElementById("loginPass").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
+  uEl.addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("loginPass").focus(); });
+  uEl.focus();
+}
+async function doLogin(){
+  const u=document.getElementById("loginUser").value.trim(), pw=document.getElementById("loginPass").value;
+  const btn=document.getElementById("loginBtn"); btn.disabled=true; btn.textContent="Signing in…";
+  try{
+    const resp=await fetch(API+"/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:pw})});
+    if(!resp.ok){ document.getElementById("loginErr").textContent="Incorrect username or password."; btn.disabled=false; btn.textContent="Sign in"; return; }
+    AUTH=await resp.json();
+    try{ localStorage.setItem("rm_auth",JSON.stringify(AUTH)); }catch(e){}
+    renderWho();
+    router();
+  }catch(e){ document.getElementById("loginErr").textContent="Could not reach the backend."; btn.disabled=false; btn.textContent="Sign in"; }
+}
+const $=(s,r=document)=>r.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const money=n=>"$"+Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+const escHTML=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const escAttr=s=>escHTML(s).replace(/"/g,"&quot;");
+const paperclip=`<svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l8-8a3.3 3.3 0 0 1 4.7 4.7l-8 8a1.6 1.6 0 0 1-2.3-2.3l7.3-7.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const chev=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const backIcon=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const phoneIcon=`<svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1L6.6 10.8z" fill="currentColor"/></svg>`;
+const DEC={
+  confirmed_trigger_mesh:{l:"Confirmed",c:"rose"}, chase_record:{l:"Scope drift",c:"accent"},
+  remedy_quality_flag:{l:"Remedy-quality",c:"accent"}, monitor:{l:"Monitoring",c:"violet"},
+  keep_open:{l:"Open",c:"violet"}, insufficient_evidence:{l:"Insufficient",c:"mut"}, no_signal:{l:"No signal",c:"mut"},
+};
+const CLEARED=new Set(["no_signal","insufficient_evidence"]);
+// criticality (ops severity) by decision — so it's obvious which cases to work first
+const CRIT={
+  confirmed_trigger_mesh:{key:"critical", l:"Critical"},
+  chase_record:{key:"high", l:"High"},
+  remedy_quality_flag:{key:"high", l:"High"},
+  monitor:{key:"medium", l:"Medium"},
+  keep_open:{key:"medium", l:"Medium"},
+};
+const crit=d=>CRIT[d]||null;
+const icDoc=`<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13h6M9 17h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
+const icGate=`<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l9 9-9 9-9-9 9-9Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>`;
+const icScale=`<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 21h14M7 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7 7l-4 7a4 4 0 0 0 8 0l-4-7Zm10 0l-4 7a4 4 0 0 0 8 0l-4-7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const icLock=`<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
+const PHASE={
+  layer1:{l:"Layer 1 · Evidence", c:"", ic:icDoc, sub:"Checking the claim's VIN, lot and install records against the recall scope."},
+  gate:{l:"Gate", c:"p-gate", ic:icGate, sub:"Deciding whether this is an isolated repair or a scope issue that needs supplier action."},
+  layer2:{l:"Layer 2 · Negotiation Mesh", c:"p-l2", ic:icScale, sub:"Agents solicit and counter-offer with each supplier in parallel to cover the shortfall."},
+  call:{l:"Supplier Call", c:"p-call", ic:phoneIcon, sub:"Calling only the suppliers that won an allocation, to confirm the price before the deal is final."},
+  ledger:{l:"Commitment Ledger", c:"p-ledger", ic:icLock, sub:"Locking in the allocation decided above, ahead of the confirmation calls."},
+  resolution:{l:"Resolution · Agent verdict", c:"p-resolution", ic:icScale, sub:"A live agent interprets the deterministic verdict and recommends the next action for this tag."},
+  resolved:{l:"Resolved", c:"p-ledger", ic:icLock, sub:"Closed out by a human operator."},
+};
+const SUPNAME={SUP_A:"Haldane Components",SUP_B:"Correns Manufacturing",SUP_C:"Ridgeline Precision"};
+const dec=d=>DEC[d]||{l:d,c:"mut"};
+function outcomeTone(o){
+  if(!o) return "mut";
+  const s=String(o).toLowerCase();
+  if(s==="rate_limited") return "rate_limited";
+  if(s==="thinking") return "thinking";
+  if(["confirmed","committed","re-committed","trigger_mesh","accept"].some(k=>s.includes(k))) return "ok";
+  if(["declined","escalated","broken"].some(k=>s.includes(k))) return "rose";
+  if(s==="no_mesh") return "mut";
+  return "accent";
+}
+function animateIn(scope=document){requestAnimationFrame(()=>{let i=0;scope.querySelectorAll(".rise").forEach(e=>{e.style.transitionDelay=(i++*45)+"ms";e.classList.add("in");});});}
+function highlightMoney(text){ return text.replace(/\$[\d,]+(?:\.\d+)?/g, m=>`<span class="fbid">${m}</span>`); }
+function evidenceBlock(meta){
+  if(!meta || !meta.criteria) return "";
+  const C=meta.criteria, M=meta.metrics||{};
+  const LABELS={vin_match:"VIN match",lot_match:"Lot match",scope_drift_shown:"Scope drift shown",
+    install_date_confirmed:"Install date confirmed",duplicate_cleared:"Duplicates cleared",threshold_crossed:"Threshold crossed"};
+  const rows=Object.entries(LABELS).map(([k,l])=>{
+    const v=!!C[k];
+    return `<div class="evrow"><span class="evmark ${v?'y':'n'}">${v?'&check;':'&ndash;'}</span>${l}</div>`;
+  }).join("");
+  return `<div class="evbox">${rows}
+    <div class="evmetrics" style="grid-column:1/-1">
+      <span>complaints <b>${M.raw_complaints??'–'}</b></span>
+      <span>deduped <b>${M.deduped??'–'}</b></span>
+      <span>post-remedy fails <b>${M.post_remedy_failures??'–'}</b></span>
+      <span>ratio <b>${M.post_pre_rate_ratio??'–'}×</b></span>
+      <span>threshold <b>${M.rate_threshold??'–'}×</b></span>
+      <span>geo cluster <b>${M.cluster_crossed?'yes':'no'}</b></span>
+    </div></div>`;
+}
+function reasonBlock(meta){
+  if(!meta || !meta.rationale) return "";
+  const n=meta.num_alternatives??0;
+  return `<div class="reason">${meta.rationale}<div class="reasonmeta">scoped to this offer only — sees the ceiling + ${n} alternative supplier${n===1?'':'s'}, never another supplier's bid</div></div>`;
+}
+function stanceChip(meta){
+  if(!meta || !meta.stance) return "";
+  return `<span class="stance ${meta.stance}">${meta.stance}</span>`;
+}
+
+async function conn(){try{await fetch(API+"/api/cases");return true;}catch(e){return false;}}
+
+let currentES=null;
+function closeStream(){ if(currentES){ currentES.close(); currentES=null; } }
+
+/* ---- light / dark theme ---- */
+function currentTheme(){
+  const set=document.documentElement.getAttribute("data-theme");
+  if(set) return set;
+  return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+}
+function applyTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  try{ localStorage.setItem("rm-theme", t); }catch(e){}
+}
+$("#themeBtn").onclick=()=>applyTheme(currentTheme()==="dark" ? "light" : "dark");
+
+function setNav(){
+  const h=location.hash;
+  const isNotif=h.startsWith("#/notifications"), isResolved=h.startsWith("#/resolved")||h.startsWith("#/audit");
+  $("#navCases")?.classList.toggle("active", !isNotif && !isResolved);
+  $("#navAlerts")?.classList.toggle("active", isNotif);
+  $("#navResolved")?.classList.toggle("active", isResolved);
+}
+function router(){
+  if(!AUTH){ showLogin(); return; }
+  closeStream(); setChrome(); setNav();
+  const h=location.hash;
+  const mCase=h.match(/^#\/case\/(.+)$/), mAudit=h.match(/^#\/audit\/(.+)$/);
+  if(h.startsWith("#/notifications")) renderNotifications();
+  else if(h.startsWith("#/resolved")) renderResolved();
+  else if(mAudit) renderAudit(decodeURIComponent(mAudit[1]));
+  else if(mCase) renderCase(decodeURIComponent(mCase[1]));
+  else renderDashboard();
+}
+window.addEventListener("hashchange",router);
+
+/* ---- notifications: the human-in-the-loop queue ---- */
+const NIC={
+  po_draft:`<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5M9 13h6M9 17h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  rejected:`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
+  escalation:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5 22 20H2L12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4M12 17.3v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  part573_draft:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5l7.5 3v5.3c0 4.4-3 8.2-7.5 9.7-4.5-1.5-7.5-5.3-7.5-9.7V5.5L12 2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.6 11.8l2.3 2.3 4.4-4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  sent:`<svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+};
+const sendIcon=`<svg viewBox="0 0 24 24" fill="none"><path d="M4 12l16-7-7 16-2.5-6.5L4 12Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>`;
+const checkIcon=`<svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const dlIcon=`<svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const fmtAgo=iso=>{ if(!iso) return ""; const s=(Date.now()-new Date(iso).getTime())/1000;
+  if(s<60) return "just now"; if(s<3600) return Math.floor(s/60)+"m ago"; if(s<86400) return Math.floor(s/3600)+"h ago"; return Math.floor(s/86400)+"d ago"; };
+
+let notifTimer=null;
+async function refreshNavBadge(){
+  try{
+    const d=await (await fetch(API+"/api/notifications")).json();
+    const b=$("#navBadge"); if(!b) return d;
+    if(d.pending>0){ b.textContent=d.pending; b.hidden=false; } else b.hidden=true;
+    return d;
+  }catch(e){ return null; }
+}
+
+async function renderNotifications(){
+  const v=$("#view");
+  v.innerHTML=`<div class="page">
+    <div class="lede rise"><div class="nhead"><h1>Notifications</h1></div>
+      <p>The agent drafts; you decide. Confirmed calls arrive as purchase orders to approve and send. Declines and uncovered shortfalls surface here too.</p>
+      <div class="nsub" id="nsub"></div></div>
+    <div id="nbody"></div></div>`;
+  animateIn(v);
+  if(!(await conn())){ $("#nbody").innerHTML=`<div class="nempty rise in"><div class="ei">${NIC.sent}</div><h3>Backend offline</h3></div>`; return; }
+  const d=await (await fetch(API+"/api/notifications")).json();
+  refreshNavBadge();
+  const items=d.notifications||[];
+  const c=d.counts||{};
+  $("#nsub").innerHTML=`<span><b>${d.pending||0}</b> awaiting you</span>`+
+    `<span><b>${c.pending_po||0}</b> PO drafts</span>`+
+    `<span><b>${c.part573_draft||0}</b> Part 573 amendments</span>`+
+    `<span><b>${c.rejected||0}</b> declined</span>`+
+    `<span><b>${c.escalation||0}</b> escalations</span>`;
+
+  if(!items.length){
+    $("#nbody").innerHTML=`<div class="nempty rise in"><div class="ei">${NIC.po_draft}</div>
+      <h3>No notifications yet</h3>
+      <div style="max-width:40ch">When a supplier confirms on a call, the draft purchase order lands here for your approval.</div></div>`;
+    animateIn($("#nbody")); return;
+  }
+  const pending=items.filter(n=>n.status==="pending");
+  const done=items.filter(n=>n.status!=="pending");
+  let html="";
+  if(pending.length) html+=`<div class="nsect rise"><h2>Needs your action</h2>${pending.map(cardHTML).join("")}</div>`;
+  if(done.length) html+=`<div class="nsect rise"><h2>Sent &amp; cleared</h2>${done.map(cardHTML).join("")}</div>`;
+  $("#nbody").innerHTML=html;
+  $("#nbody").querySelectorAll(".ncard").forEach(cel=>{
+    cel.onclick=()=>openNotif(cel.dataset.id);
+  });
+  animateIn($("#nbody"));
+}
+
+function cardHTML(n){
+  const success=n.status==="sent"||n.status==="filed";
+  const terminal=n.status!=="pending";          // sent / filed / declined all leave the queue
+  const typeCls=n.type==="po_draft"?"po":(n.type==="part573_draft"?"part573":n.type);
+  const cls=success?"sent":typeCls;
+  const icon=success?NIC.sent:(NIC[n.type]||NIC.po_draft);
+  const ref=n.po_number||n.memo_number||"";
+  let cta="";
+  if(n.status==="filed") cta=`<span class="sentmark">${checkIcon}Filed</span>`;
+  else if(n.status==="sent") cta=`<span class="sentmark">${checkIcon}Sent</span>`;
+  else if(n.status==="declined") cta=`<span class="pill mut"><em></em>${n.type==="part573_draft"?"returned":"declined"}</span>`;
+  else if(n.type==="po_draft") cta=`<span class="ncta">Review &amp; send ${chev}</span>`;
+  else if(n.type==="part573_draft") cta=`<span class="ncta">Review &amp; file ${chev}</span>`;
+  else if(n.type==="rejected") cta=`<span class="pill mut"><em></em>re-sourced</span>`;
+  else if(n.type==="escalation") cta=`<span class="pill amber"><em></em>needs decision</span>`;
+  return `<div class="ncard ${cls} ${terminal?'done':''}" data-id="${n.id}">
+    <span class="nspine"></span>
+    <span class="nicon">${icon}</span>
+    <div><div class="ntitle">${n.title}</div><div class="ndetail">${n.detail||""}</div>
+      <div class="nmeta"><span class="mono">${n.case_id}</span>${ref?`<span>·</span><span class="mono">${ref}</span>`:""}<span>·</span><span>${fmtAgo(n.created)}</span></div></div>
+    <div>${cta}</div></div>`;
+}
+
+/* ---- resolved queue + audit trail ---- */
+async function renderResolved(){
+  const v=$("#view");
+  v.innerHTML=`<div class="page">
+    <div class="lede rise"><h1>Resolved</h1>
+      <p>Cases closed out — Confirmed cases handed over as purchase orders, the rest resolved by the operator. Each keeps its full audit trail.</p>
+      <div class="nsub" id="rsub"></div></div>
+    <div id="rbody"></div></div>`;
+  animateIn(v);
+  if(!(await conn())){ $("#rbody").innerHTML=`<div class="nempty rise in"><div class="ei">${icLock}</div><h3>Backend offline</h3></div>`; return; }
+  const d=await (await fetch(API+"/api/resolved")).json();
+  const rows=d.resolved||[];
+  $("#rsub").innerHTML=`<span><b>${d.total||0}</b> resolved</span>`;
+  if(!rows.length){
+    $("#rbody").innerHTML=`<div class="nempty rise in"><div class="ei">${checkIcon}</div>
+      <h3>Nothing resolved yet</h3><div style="max-width:42ch">When you send a PO or resolve a case, it lands here with its full audit trail.</div></div>`;
+    animateIn($("#rbody")); return;
+  }
+  $("#rbody").innerHTML=`<div class="nsect rise">${rows.map(resolvedCardHTML).join("")}</div>`;
+  $("#rbody").querySelectorAll(".rcard").forEach(c=>c.onclick=()=>location.hash="#/audit/"+c.dataset.id);
+  animateIn($("#rbody"));
+}
+function resolvedCardHTML(r){
+  return `<div class="rcard" data-id="${r.case_id}">
+    <span class="rspine"></span>
+    <div><div class="rtitle">${r.component||r.case_id}<small>${r.oem||""}</small></div>
+      <div class="rmeta"><span class="mono">${r.case_id}</span><span>·</span><span>${r.action||"Resolved"}</span>${r.owner?`<span>·</span><span>${r.owner}</span>`:""}<span>·</span><span>${fmtAgo(r.resolved_at)}</span></div></div>
+    <div class="raction">${checkIcon} ${r.steps} steps ${chev}</div></div>`;
+}
+
+async function renderAudit(id){
+  const v=$("#view");
+  v.innerHTML=`<div class="page">
+    <div class="back" onclick="location.hash='#/resolved'">${backIcon} Resolved</div>
+    <div class="chd"><h1>${id}</h1><span class="pill ok"><em></em>Resolved</span></div>
+    <div id="abody"><div class="loadwrap"><div class="ring"></div><div>Loading audit trail…</div></div></div></div>`;
+  await conn();
+  const d=await (await fetch(`${API}/api/timeline/${id}`)).json();
+  const tl=d.timeline||[];
+  const body=$("#abody"); body.innerHTML="";
+  if(!tl.length){ body.innerHTML=`<div class="err">No audit trail recorded — this case hasn't been run.</div>`; return; }
+  const feed=el("div","feed"); body.appendChild(feed);
+  renderStaticFeed(feed, tl);
+}
+
+/* render a stored timeline statically (the audit trail), reusing the live-feed look */
+function renderStaticFeed(feed, events){
+  let lastPhase=null, curLines=null;
+  events.forEach(ev=>{
+    if(ev.phase!==lastPhase){
+      lastPhase=ev.phase;
+      const P=PHASE[ev.phase]||{l:ev.phase,c:"",ic:"",sub:""};
+      const sec=el("div",`psec ${P.c}`,`<div class="phead">${P.ic||""}<div class="ptext"><div class="ptitle">${P.l}</div>${P.sub?`<div class="psub">${P.sub}</div>`:""}</div></div><div class="plines"></div>`);
+      feed.appendChild(sec); curLines=sec.querySelector(".plines");
+    }
+    if(ev.outcome==="thinking") return;
+    const P=PHASE[ev.phase]||{c:""};
+    if(ev.phase==="call"){
+      const isSup=/\(supplier\)/.test(ev.actor||"");
+      const mode=(ev.meta&&ev.meta.mode)||"simulated";
+      const who=(ev.actor||"").replace(" (supplier)","");
+      const text=(ev.text||"").replace(/^\[[a-z]+\]\s*/i,"");
+      const row=el("div",`crow ${isSup?'sup':'agent'} in`);
+      row.innerHTML=`<div class="cwrap"><div class="cwho">${phoneIcon}<span>${who}</span><span class="cmode ${mode}">${mode==='twilio'?'live call':'simulated'}</span></div><div class="cbub ${isSup?'sup':'agent'}">${text}${ev.outcome&&ev.outcome!=='ringing'?` <span class="foutcome ${outcomeTone(ev.outcome)}">${String(ev.outcome).replace(/_/g,' ')}</span>`:''}</div></div>`;
+      curLines.appendChild(row); return;
+    }
+    const tone=outcomeTone(ev.outcome);
+    const text=ev.phase==="layer2"?highlightMoney(ev.text||""):(ev.text||"");
+    const line=el("div",`fline ${P.c} in`);
+    line.innerHTML=`<span class="fdot"></span><div class="fbody"><div class="fhead"><b>${ev.actor}</b>${stanceChip(ev.meta)}</div><div class="ftext">${text}${ev.outcome?` <span class="foutcome ${tone}">${String(ev.outcome).replace(/_/g,' ')}</span>`:''}</div>${reasonBlock(ev.meta)}${evidenceBlock(ev.meta)}</div>`;
+    curLines.appendChild(line);
+  });
+}
+
+/* ---- drawer ---- */
+let _notifDirty=false;
+function closeDrawer(){
+  const s=$("#scrim"), dr=$("#drawer");
+  if(dr) dr.classList.remove("in");
+  if(s) s.classList.remove("in");
+  setTimeout(()=>{ s?.remove(); dr?.remove();
+    if(_notifDirty && location.hash.startsWith("#/notifications")){ _notifDirty=false; renderNotifications(); }
+  },340);
+}
+function openDrawer(inner){
+  closeDrawer();
+  const scrim=el("div","scrim"); scrim.id="scrim"; scrim.onclick=closeDrawer;
+  const dr=el("div","drawer"); dr.id="drawer"; dr.innerHTML=inner;
+  document.body.append(scrim,dr);
+  requestAnimationFrame(()=>{ scrim.classList.add("in"); dr.classList.add("in"); });
+  dr.querySelector(".dclose").onclick=closeDrawer;
+  document.addEventListener("keydown",function esc(e){ if(e.key==="Escape"){ closeDrawer(); document.removeEventListener("keydown",esc);} });
+}
+function poDocHTML(n){
+  const qty=n.quantity||0, price=n.unit_price||0, total=n.amount!=null?n.amount:qty*price;
+  return `<div class="podoc">
+    <div class="pk">Remedy Mesh · Purchase Order</div>
+    <div class="pt">${n.oem||""} — recall remedy procurement</div>
+    <div class="prow">
+      <div class="pc"><div class="pl">PO number</div><div class="pv mono">${n.po_number||"—"}</div></div>
+      <div class="pc"><div class="pl">Case</div><div class="pv mono">${n.case_id}</div></div>
+      <div class="pc"><div class="pl">Campaign</div><div class="pv mono">${n.campaign_id||"—"}</div></div>
+      <div class="pc"><div class="pl">Supplier</div><div class="pv">${n.supplier_name||n.supplier_id}</div></div>
+    </div>
+    <div class="pline">
+      <div class="pd">${n.component||"Replacement units"}<small>${n.model?n.model+" · ":""}recall remedy${n.backfill_note?" · "+n.backfill_note:""}</small></div>
+      <div class="pq">${qty.toLocaleString()} units</div>
+      <div class="pq">${money(price)}/unit · ${n.deadline_weeks||12} wks</div>
+    </div>
+    <div class="ptot"><span class="tl">Total</span><span class="tv">${money(total)}</span></div>
+    <div class="pstamp"><b>DRAFT — pending your approval.</b> Confirmed by ${n.supplier_name||n.supplier_id} on a recorded call. The agent drafts; a human sends.</div>
+  </div>`;
+}
+function transcriptHTML(t){
+  if(!t||!t.length) return "";
+  return `<div class="dlabel">Call transcript</div><div class="tscript">`+t.map(x=>{
+    const agent=/agent/i.test(x.actor);
+    return `<div class="tturn ${agent?'agent':''}"><span class="tw">${agent?'Agent':x.actor.replace(' (supplier)','')}</span><span class="tx">${x.text}</span></div>`;
+  }).join("")+`</div>`;
+}
+
+async function openNotif(id){
+  const n=await (await fetch(`${API}/api/notifications/${id}`)).json();
+  const kindLabel={po_draft:"Purchase order",part573_draft:"Part 573 amendment",rejected:"Supplier declined",escalation:"Escalation"}[n.type]||"Notification";
+  const done=n.status==="sent"||n.status==="filed";
+  const kcls=done?"sent":(n.type==="part573_draft"?"part573":n.type);
+  let body="";
+  if(n.type==="part573_draft"){
+    const ed=n.filing_draft||{};
+    const filed=n.status==="filed";
+    body=`<div class="dsum">
+      <div><div class="k">NHTSA campaign</div><div class="vv mono">${n.nhtsa_number||"—"}</div></div>
+      <div><div class="k">Amendment ref</div><div class="vv mono">${n.memo_number||"—"}</div></div>
+      <div><div class="k">Vehicles added</div><div class="vv mono" style="color:var(--rose)">+${(n.added_units||0).toLocaleString()}</div></div>
+      <div><div class="k">Revised population</div><div class="vv mono">${(n.population_new||0).toLocaleString()}</div></div>
+      <div class="wide"><div class="k">Component</div><div class="vv" style="font-weight:500">${n.component||""}${n.model?` · ${n.model}`:""}</div></div>
+    </div>
+    <div class="dlabel">Part 573 amendment — recall population expansion</div>
+    <iframe class="pdfframe" src="${API}/api/notifications/${id}/pdf" title="Part 573 amendment PDF"></iframe>
+    <a class="pdflink" href="${API}/api/notifications/${id}/pdf" target="_blank">${dlIcon} Open PDF in a new tab</a>
+    <div class="dlabel">${filed?"Filing record":"Filing cover note"}</div>
+    <div class="efield"><label>To</label><input id="emTo" value="${escAttr(ed.to||"")}" ${filed?"disabled":""}></div>
+    <div class="efield"><label>Subject</label><input id="emSubject" value="${escAttr(ed.subject||"")}" ${filed?"disabled":""}></div>
+    <div class="efield"><label>Message${filed?"":" · editable"}</label><textarea id="emBody" ${filed?"disabled":""}>${escHTML(ed.body||"")}</textarea></div>
+    <div class="eattach">${paperclip}<span>Attached: <b>${n.memo_number}.pdf</b> — the Part 573 amendment</span></div>`;
+  } else if(n.type==="po_draft"){
+    const ed=n.email_draft||{};
+    const sent=n.status==="sent";
+    body=`<div class="dsum">
+      <div><div class="k">Supplier</div><div class="vv">${n.supplier_name||n.supplier_id}</div></div>
+      <div><div class="k">PO number</div><div class="vv mono">${n.po_number||"—"}</div></div>
+      <div><div class="k">Amount</div><div class="vv mono">${n.amount!=null?money(n.amount):"—"}</div></div>
+      <div><div class="k">Case</div><div class="vv mono">${n.case_id}</div></div>
+      <div class="wide"><div class="k">Terms</div><div class="vv" style="font-weight:500">${n.detail||""}</div></div>
+    </div>
+    <div class="dlabel">Purchase order</div>
+    <iframe class="pdfframe" src="${API}/api/notifications/${id}/pdf" title="Purchase order PDF"></iframe>
+    <a class="pdflink" href="${API}/api/notifications/${id}/pdf" target="_blank">${dlIcon} Open PDF in a new tab</a>
+    <div class="dlabel">${sent?"Email sent":"Email to send"}</div>
+    <div class="efield"><label>To</label><input id="emTo" value="${escAttr(ed.to||"")}" ${sent?"disabled":""}></div>
+    <div class="efield"><label>Subject</label><input id="emSubject" value="${escAttr(ed.subject||"")}" ${sent?"disabled":""}></div>
+    <div class="efield"><label>Message${sent?"":" · editable"}</label><textarea id="emBody" ${sent?"disabled":""}>${escHTML(ed.body||"")}</textarea></div>
+    <div class="eattach">${paperclip}<span>Attached: <b>${n.po_number}.pdf</b> — the purchase order</span></div>`;
+  } else {
+    const band=n.type==="rejected"?"rejected":"escalation";
+    body=`<div class="noteband ${band}">${NIC[n.type]}<div>${n.detail||""}</div></div>
+    ${transcriptHTML(n.transcript)}`;
+  }
+  let foot="";
+  if(n.type==="part573_draft"){
+    if(n.status==="filed"){
+      const to=(n.email&&n.email.to)||"";
+      foot=`<div class="dfoot"><span class="sentmark">${checkIcon}Filed${n.filed_by?` · ${n.filed_by}`:""}</span>
+        <div class="fnote">${n.email&&n.email.mode==="simulated"?"Simulated — add the Gmail app password to file for real.":("Amendment filed and recorded"+(to?` · ${to}`:""))}</div></div>`;
+    }else if(n.status==="declined"){
+      foot=`<div class="dfoot"><span class="sentmark" style="color:var(--rose)">Returned${n.declined_by?` · ${n.declined_by}`:""}</span>
+        <div class="fnote">Sent back to the Analyst for revision — logged to the audit trail.</div></div>`;
+    }else{
+      const canApprove=AUTH&&AUTH.role==="Approver";
+      foot=`<div class="dfoot"><button class="btn primary" id="fileBtn" ${canApprove?"":"disabled title='Sign in as the Approver to file this'"}>${sendIcon} Approve &amp; file</button>
+        <button class="btn" id="declineBtn" ${canApprove?"":"disabled title='Sign in as the Approver to return this'"} style="margin-left:8px">Return</button>
+        <div class="fnote">${canApprove?"File the amendment, or return it<br/>to the Analyst for revision.":"Only an Approver can act on this."}</div></div>`;
+    }
+  } else if(n.type==="po_draft" && n.status!=="sent" && n.status!=="declined"){
+    const canApprove=AUTH&&AUTH.role==="Approver";
+    foot=`<div class="dfoot"><button class="btn primary" id="approveBtn" ${canApprove?"":"disabled title='Sign in as the Approver to send this'"}>${sendIcon} Approve &amp; send</button>
+      <button class="btn" id="declineBtn" ${canApprove?"":"disabled title='Sign in as the Approver to decline this'"} style="margin-left:8px">Decline</button>
+      <div class="fnote">${canApprove?"Sends the email above,<br/>with the PO attached.":"Only an Approver can act on this."}</div></div>`;
+  } else if(n.status==="declined"){
+    foot=`<div class="dfoot"><span class="sentmark" style="color:var(--rose)">Declined${n.declined_by?` · ${n.declined_by}`:""}</span>
+      <div class="fnote">Logged to the audit trail.</div></div>`;
+  } else if(n.status==="sent"){
+    const to=(n.email&&n.email.to)||"";
+    foot=`<div class="dfoot"><span class="sentmark">${checkIcon}Sent${to?` · ${to}`:""}</span>
+      <div class="fnote">${n.email&&n.email.mode==="simulated"?"Simulated — set SMTP to send for real.":"Emailed with the PO attached."}</div></div>`;
+  }
+  openDrawer(`<div class="dhd"><div><div class="dk ${kcls}">${kindLabel}</div><h2>${n.title}</h2></div>
+    <button class="dclose" aria-label="Close">&times;</button></div>
+    <div class="dbody">${body}</div>${foot}`);
+  const ab=$("#approveBtn");
+  if(ab) ab.onclick=()=>approveNotif(id, ab);
+  const db=$("#declineBtn");
+  if(db) db.onclick=()=>declineNotif(id, db);
+  const fb=$("#fileBtn");
+  if(fb) fb.onclick=()=>fileNotif(id, fb);
+}
+
+async function fileNotif(id, btn){
+  const payload={
+    to:($("#emTo")?.value||"").trim(),
+    subject:($("#emSubject")?.value||"").trim(),
+    body:($("#emBody")?.value||""),
+  };
+  if(!payload.to){ alert("Add a filing recipient first."); return; }
+  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:16px;height:16px;border-width:2px"></span> Filing…`;
+  try{
+    const resp=await fetch(`${API}/api/notifications/${id}/file`,{method:"POST",
+      headers:{"Content-Type":"application/json",...authHeaders()},body:JSON.stringify(payload)});
+    if(resp.status===401||resp.status===403){ signOut(); return; }
+    const r=await resp.json();
+    ["emTo","emSubject","emBody"].forEach(i=>{const e=document.getElementById(i);if(e)e.disabled=true;});
+    const foot=btn.closest(".dfoot");
+    const to=(r.email&&r.email.to)||payload.to;
+    const ok=r.email&&r.email.sent;
+    const note=r.email&&r.email.mode==="simulated"
+      ? "Simulated — add the Gmail app password to file for real."
+      : (ok?("Amendment filed and recorded"+(to?` · ${to}`:"")):("Filing failed: "+((r.email&&r.email.error)||"unknown")));
+    foot.innerHTML=`<span class="sentmark">${checkIcon}Filed</span><div class="fnote">${note}</div>`;
+    _notifDirty=true; refreshNavBadge();
+  }catch(e){
+    btn.disabled=false; btn.innerHTML=`${sendIcon} Approve &amp; file`;
+    alert("Could not file: "+e.message);
+  }
+}
+
+async function declineNotif(id, btn){
+  btn.disabled=true;
+  const ab=$("#approveBtn"); if(ab) ab.disabled=true;
+  const fb=$("#fileBtn"); if(fb) fb.disabled=true;
+  try{
+    const resp=await fetch(`${API}/api/notifications/${id}/reject`,{method:"POST",headers:{...authHeaders()}});
+    if(resp.status===401||resp.status===403){ signOut(); return; }
+    const r=await resp.json();
+    const isMemo=r.notification&&r.notification.type==="part573_draft";
+    const who=r.notification&&r.notification.declined_by?` · ${r.notification.declined_by}`:"";
+    const foot=btn.closest(".dfoot");
+    foot.innerHTML=`<span class="sentmark" style="color:var(--rose)">${isMemo?"Returned":"Declined"}${who}</span>`+
+      `<div class="fnote">${isMemo?"Sent back to the Analyst for revision — logged to the audit trail.":"Logged to the audit trail."}</div>`;
+    _notifDirty=true; refreshNavBadge();
+  }catch(e){ btn.disabled=false; if(ab) ab.disabled=false; if(fb) fb.disabled=false; alert("Could not return: "+e.message); }
+}
+
+async function approveNotif(id, btn){
+  const payload={
+    to:($("#emTo")?.value||"").trim(),
+    subject:($("#emSubject")?.value||"").trim(),
+    body:($("#emBody")?.value||""),
+  };
+  if(!payload.to){ alert("Add a recipient email first."); return; }
+  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:16px;height:16px;border-width:2px"></span> Sending…`;
+  try{
+    const resp0=await fetch(`${API}/api/notifications/${id}/approve`,{method:"POST",
+      headers:{"Content-Type":"application/json",...authHeaders()},body:JSON.stringify(payload)});
+    if(resp0.status===401||resp0.status===403){ signOut(); return; }
+    const r=await resp0.json();
+    ["emTo","emSubject","emBody"].forEach(i=>{const e=document.getElementById(i);if(e)e.disabled=true;});
+    const foot=btn.closest(".dfoot");
+    const to=(r.email&&r.email.to)||payload.to;
+    const ok=r.email&&r.email.sent;
+    const note=r.email&&r.email.mode==="simulated"
+      ? "Simulated — add the Gmail app password to send for real."
+      : (ok?"Email sent with the PO attached.":("Send failed: "+((r.email&&r.email.error)||"unknown")));
+    foot.innerHTML=`<span class="sentmark">${checkIcon}Sent${to?` · ${to}`:""}</span><div class="fnote">${note}</div>`;
+    _notifDirty=true; refreshNavBadge();
+  }catch(e){
+    btn.disabled=false; btn.innerHTML=`${sendIcon} Approve &amp; send`;
+    alert("Could not send: "+e.message);
+  }
+}
+
+function buildRow(r){
+  const D=dec(r.decision);
+  const C=crit(r.decision);
+  const row=el("div","row"+(C?` crit-${C.key}`:""));
+  row.innerHTML=`
+    <div class="id"><span>${r.case_id}</span>${C?`<span class="critchip ${C.key}">${C.l}</span>`:''}</div>
+    <div class="cmp">${r.component}<small>${r.model||r.oem}</small></div>
+    <div><span class="pill ${D.c}"><em></em>${D.l}</span></div>
+    <div class="num">${r.complaints} complaints · ${r.ratio}×</div>
+    <div class="chev">${chev}</div>`;
+  row.onclick=()=>location.hash=`#/case/${r.case_id}`;
+  return row;
+}
+
+async function renderDashboard(){
+  const v=$("#view");
+  v.innerHTML=`<div class="page">
+    <div class="lede rise"><h1>Case monitor</h1><p>Closed recall campaigns, re-checked against live evidence. Scope drift is detected from records, never assumed.</p></div>
+    <div id="body"></div></div>`;
+  animateIn(v);
+  if(!(await conn())){$("#body").innerHTML=`<div class="dist rise in" style="margin-top:44px"><h2>Backend offline</h2><p style="color:var(--ink-2);margin-top:8px">Start the API, then reload.</p></div>`;return;}
+  const d=await (await fetch(API+"/api/overview")).json();
+  const C=d.counts, confirmed=C.confirmed_trigger_mesh||0, drift=C.chase_record||0, rq=C.remedy_quality_flag||0, watch=(C.monitor||0)+(C.keep_open||0), clear=(C.no_signal||0)+(C.insufficient_evidence||0), tot=d.total||1;
+  const active=d.rows.filter(r=>!CLEARED.has(r.decision) && !r.resolved);
+  const cleared=d.rows.filter(r=>CLEARED.has(r.decision) && !r.resolved);
+  $("#body").innerHTML=`
+    <div class="metrics">
+      <div class="metric lead critical rise"><span class="tag"><em></em>Critical · solving now</span><div class="n">${confirmed}</div><div class="l"><b>confirmed scope expansion</b></div></div>
+      <div class="metric rise"><div class="n drift">${drift}</div><div class="l"><b>scope drift</b></div></div>
+      <div class="metric rise"><div class="n ambr">${rq}</div><div class="l"><b>remedy-quality</b> flag</div></div>
+      <div class="metric rise"><div class="n mut">${clear}</div><div class="l"><b>no signal</b> · screened out</div></div>
+    </div>
+    <div class="dist rise"><h2>Signal distribution</h2>
+      <div class="bar" id="distbar">
+        <i id="b-crit" style="background:var(--rose)"></i>
+        <i id="b-drift" style="background:var(--accent)"></i>
+        <i id="b-rq" style="background:var(--accent)"></i>
+        <i id="b-watch" style="background:var(--violet)"></i>
+        <i id="b-clear" style="background:var(--line-2)"></i>
+      </div>
+      <div class="leg">
+        <span><em style="background:var(--rose)"></em>Critical <b>${confirmed}</b></span>
+        <span><em style="background:var(--accent)"></em>Scope drift <b>${drift}</b></span>
+        <span><em style="background:var(--accent)"></em>Remedy-quality <b>${rq}</b></span>
+        <span><em style="background:var(--violet)"></em>Under watch <b>${watch}</b></span>
+        <span><em style="background:var(--line-2)"></em>No signal <b>${clear}</b></span>
+      </div></div>
+    <div class="cases rise"><div class="hd"><h2>Cases by priority</h2><span>${active.length} need a look · ${cleared.length} no signal · open one to run the agents live</span></div>
+      <div class="list" id="list"></div>
+      ${cleared.length?`<div class="cleared-toggle" id="clearedToggle">${chev}<span id="clearedLabel">Show ${cleared.length} screened out — no signal</span></div><div class="list" id="clearedList" style="display:none"></div>`:""}
+    </div>`;
+  const list=$("#list");
+  active.forEach(r=>list.appendChild(buildRow(r)));
+  if(cleared.length){
+    const cl=$("#clearedList");
+    cleared.forEach(r=>cl.appendChild(buildRow(r)));
+    $("#clearedToggle").onclick=()=>{
+      const open=cl.style.display!=="none";
+      cl.style.display=open?"none":"block";
+      $("#clearedToggle").classList.toggle("open",!open);
+      $("#clearedLabel").textContent=open?`Show ${cleared.length} screened out — no signal`:`Hide ${cleared.length} screened out`;
+    };
+  }
+  animateIn($("#body"));
+  requestAnimationFrame(()=>{
+    $("#b-crit").style.width=(confirmed/tot*100)+"%"; $("#b-drift").style.width=(drift/tot*100)+"%";
+    $("#b-rq").style.width=(rq/tot*100)+"%";
+    $("#b-watch").style.width=(watch/tot*100)+"%"; $("#b-clear").style.width=(clear/tot*100)+"%";
+  });
+}
+
+/* ---- case view — runs the agents LIVE and streams every step as it happens ---- */
+async function renderCase(id){
+  const v=$("#view");
+  v.innerHTML=`<div class="page">
+    <div class="back" onclick="location.hash=''">${backIcon} All cases</div>
+    <div class="chd"><h1>${id}</h1><span class="timer"><span class="tdot"></span><span class="mono" id="tval">0.0s</span></span></div>
+    <div id="cbody">
+      <div class="loadwrap" id="loadwrap"><div class="ring"></div><div>${AUTH&&AUTH.role==="Approver"?"Loading the Analyst's review…":"Connecting to the agents…"}</div></div>
+      <div class="caselayout">
+        <div class="feed" id="feed"></div>
+        <aside class="agents" id="agents"><h3>Agents</h3><div id="agentRows"></div></aside>
+      </div>
+    </div></div>`;
+  const t0=performance.now();
+  const stamp=()=>((performance.now()-t0)/1000).toFixed(1);
+  const timerId=setInterval(()=>{ const t=$("#tval"); if(t) t.textContent=stamp()+"s"; },100);
+  await conn();
+
+  let lastPhase=null, seenAny=false, curLines=null;
+  const agentState=new Map(), agentOrder=[];
+  // Layer 2 negotiation mesh: each supplier is an isolated parallel session (a lane);
+  // the OEM agent counters over-ceiling offers and allocates. Driven entirely by the
+  // layer2 SSE events already emitted — a rendering of what's happening, not new data.
+  const mesh={order:[],lane:{},oem:{active:false,thinking:false,retry:false,counters:0,alloc:[],units:0,cost:0,ceiling:null},mount:null};
+  function meshLane(sid){ if(!mesh.lane[sid]){ mesh.lane[sid]={thinking:false}; mesh.order.push(sid); } return mesh.lane[sid]; }
+  function meshEvent(ev){
+    if(!mesh.mount){ mesh.mount=el("div","mesh"); (curLines||$("#feed")).appendChild(mesh.mount); }
+    const a=ev.actor||"", t=ev.text||"", m=ev.meta||{};
+    if(/^SUP_/.test(a)){
+      const L=meshLane(a);
+      if(ev.outcome==="thinking") L.thinking=true;
+      else if(ev.outcome==="rate_limited") L.retry=true;
+      else if(/^Opening offer/i.test(t)){ L.thinking=false; L.retry=false; L.offer={price:m.unit_price,qty:m.quantity}; }
+      else if(/^Revised/i.test(t)){ L.thinking=false; L.retry=false; L.revised={price:m.unit_price,qty:m.quantity,stance:String(m.stance||"").toLowerCase()}; }
+    } else if(a==="OEMCounterAgent"){
+      mesh.oem.active=true;
+      if(ev.outcome==="thinking") mesh.oem.thinking=true;
+      else if(ev.outcome==="rate_limited") mesh.oem.retry=true;
+      else if(/^Countered/i.test(t)){
+        mesh.oem.thinking=false; mesh.oem.retry=false; mesh.oem.counters++;
+        if(m.ceiling!=null) mesh.oem.ceiling=m.ceiling;   // read the ceiling from the event, never hardcode
+        const sid=m.their_offer&&m.their_offer.supplier_id;
+        const pm=t.match(/at \$([\d.]+)/); const price=pm?parseFloat(pm[1]):null;
+        if(sid) meshLane(sid).countered={price,rationale:String(m.rationale||"").trim()};
+      }
+    } else if(a==="OEM" && /^Allocated/i.test(t)){
+      mesh.oem.thinking=false;
+      const L=meshLane(m.supplier_id); L.won={qty:m.quantity,price:m.unit_price,over:m.over_ceiling};
+      mesh.oem.alloc.push(m); mesh.oem.units+=(m.quantity||0); mesh.oem.cost+=((m.quantity||0)*(m.unit_price||0));
+    }
+    renderMesh();
+  }
+  function renderMesh(){
+    if(!mesh.mount) return;
+    const lanes=mesh.order.map(sid=>{
+      const L=mesh.lane[sid], nm=SUPNAME[sid]||sid;
+      let steps="";
+      if(L.offer) steps+=`<div class="mstep"><span class="lbl">Opening</span><b>${money(L.offer.price)}</b><span class="q">${(L.offer.qty||0).toLocaleString()} units</span></div>`;
+      if(L.countered) steps+=`<div class="mstep counter"><span class="lbl">OEM counter</span><b>${money(L.countered.price)}</b>${L.countered.rationale?`<span class="rtn">${escHTML(L.countered.rationale).slice(0,120)}${L.countered.rationale.length>120?'…':''}</span>`:''}</div>`;
+      if(L.revised) steps+=`<div class="mstep"><span class="lbl">Revised</span><b>${money(L.revised.price)}</b>${L.revised.stance?`<span class="stance ${L.revised.stance}">${L.revised.stance}</span>`:''}</div>`;
+      if(!steps) steps=`<div class="mstep"><span class="lbl">${L.thinking?"Negotiating…":"Waiting"}</span></div>`;
+      return `<div class="mlane ${L.won?'won':''} ${L.thinking?'thinking':''}">
+        <div class="mlane-hd"><span class="mdot"></span>${nm}<small>${sid}</small></div>
+        <div class="mlane-steps">${steps}</div>
+        ${L.retry?`<span class="retrychip">rate-limited · retrying</span>`:''}
+      </div>`;
+    }).join("");
+    const o=mesh.oem;
+    let oemBody=`<div class="oem-hd">${icScale||""} OEM decision</div>`;
+    if(o.counters){ const cl=o.ceiling!=null?`the ${money(o.ceiling)} ceiling`:"the ceiling";
+      oemBody+=`<div class="oem-line">Counter round · re-priced ${o.counters} over-ceiling offer${o.counters>1?'s':''} toward ${cl}.</div>`; }
+    else if(o.thinking) oemBody+=`<div class="oem-line">Reasoning a counter…</div>`;
+    if(o.alloc.length) oemBody+=`<div class="oem-alloc">Allocated <span class="mono">${o.units.toLocaleString()}</span> units across ${o.alloc.length} supplier${o.alloc.length>1?'s':''} · <span class="mono">${money(o.cost)}</span></div>`;
+    mesh.mount.innerHTML=`
+      <div class="mesh-note">Each supplier negotiates in an <b>isolated Gemini session</b>, in parallel — a sealed-bid round, not a queue. The OEM agent counters any over-ceiling offer, then allocates across the winners.</div>
+      <div class="mesh-lanes">${lanes}</div>
+      <div class="mesh-bus"></div>
+      <div class="mesh-oem"><div class="oem-node ${(o.alloc.length||o.thinking||o.active)?'active':''}">${oemBody}</div></div>`;
+  }
+  function normActor(actor){
+    if(/^Agent → /.test(actor)) return "Voice Agent";
+    return actor.replace(" (supplier)","");
+  }
+  function touchAgent(actor,text,outcome){
+    const key=normActor(actor);
+    if(!agentState.has(key)) agentOrder.push(key);
+    agentState.set(key,{text:text.replace(/^\[[a-z]+\]\s*/i,''),outcome:outcome||"",ts:stamp()});
+    renderAgents();
+  }
+  function renderAgents(){
+    const box=$("#agentRows"); if(!box) return;
+    box.innerHTML=agentOrder.map(name=>{
+      const a=agentState.get(name);
+      const tone=outcomeTone(a.outcome);
+      const textCls=a.outcome==="thinking"?"atext think":"atext";
+      return `<div class="arow"><span class="adot ${tone}"></span><div class="abody"><div class="aname">${name}</div><div class="${textCls}">${a.text}</div></div><span class="ats mono">+${a.ts}s</span></div>`;
+    }).join("");
+  }
+  function settleAgents(label){
+    // The run is over — no agent is "thinking" any more. Flip any still-pending agent
+    // off the live blue dot so the panel never sits on "Thinking..." forever.
+    let touched=false;
+    agentState.forEach((a,k)=>{ if(a.outcome==="thinking"){ a.text=label||a.text; a.outcome=""; touched=true; } });
+    if(touched) renderAgents();
+  }
+  function appendCallEvent(ev){
+    const feed=$("#feed");
+    const isSupplier=/\(supplier\)/.test(ev.actor);
+    const mode=(ev.meta&&ev.meta.mode)||"simulated";
+    const who=ev.actor.replace(" (supplier)","");
+    const text=ev.text.replace(/^\[[a-z]+\]\s*/i,"");
+    const row=el("div",`crow ${isSupplier?'sup':'agent'}`);
+    row.innerHTML=`<div class="cwrap">
+      <div class="cwho">${phoneIcon}<span>${who}</span><span class="cmode ${mode}">${mode==='twilio'?'live call':'simulated'}</span><span class="mono">+${stamp()}s</span></div>
+      <div class="cbub ${isSupplier?'sup':'agent'}">${text}${ev.outcome?` <span class="foutcome ${outcomeTone(ev.outcome)}">${ev.outcome.replace(/_/g,' ')}</span>`:''}</div>
+    </div>`;
+    (curLines||feed).appendChild(row);
+    requestAnimationFrame(()=>row.classList.add("in"));
+  }
+  function appendEvent(ev){
+    if(!seenAny){ seenAny=true; $("#loadwrap")?.remove(); }
+    touchAgent(ev.actor, ev.text, ev.outcome);
+    const feed=$("#feed");
+    if(ev.phase!==lastPhase){
+      lastPhase=ev.phase;
+      const P=PHASE[ev.phase]||{l:ev.phase,c:"",ic:"",sub:""};
+      const sec=el("div",`psec ${P.c}`,`<div class="phead">${P.ic||""}<div class="ptext"><div class="ptitle">${P.l}</div>${P.sub?`<div class="psub">${P.sub}</div>`:""}</div></div><div class="plines"></div>`);
+      feed.appendChild(sec);
+      curLines=sec.querySelector(".plines");
+    }
+    if(ev.phase==="layer2"){ meshEvent(ev); return; }  // render the negotiation as a mesh, not a text log
+    if(ev.outcome==="thinking") return; // shown live in the Agents panel only -- the feed stays to real steps
+    if(ev.phase==="call"){ appendCallEvent(ev); return; }
+    const P=PHASE[ev.phase]||{c:""};
+    const tone=outcomeTone(ev.outcome);
+    const text=ev.phase==="layer2"?highlightMoney(ev.text):ev.text;
+    const line=el("div",`fline ${P.c}${ev.outcome==="rate_limited"?" sysnote":""}`);
+    line.innerHTML=`<span class="fdot"></span><div class="fbody"><div class="fhead"><b>${ev.actor}</b>${stanceChip(ev.meta)}<span class="ft mono">+${stamp()}s</span></div><div class="ftext">${text}${ev.outcome?` <span class="foutcome ${tone}">${ev.outcome.replace(/_/g,' ')}</span>`:''}</div>${reasonBlock(ev.meta)}${evidenceBlock(ev.meta)}</div>`;
+    (curLines||feed).appendChild(line);
+    requestAnimationFrame(()=>line.classList.add("in"));
+  }
+
+  let d;
+  try{
+    d=await new Promise((resolve,reject)=>{
+      const tokQ=AUTH&&AUTH.token?`&token=${encodeURIComponent(AUTH.token)}`:"";
+      const es=new EventSource(`${API}/api/run_stream/${id}?use_llm=true${tokQ}`);
+      currentES=es;
+      es.onmessage=(e)=>{
+        let msg; try{ msg=JSON.parse(e.data); }catch(_){ return; }
+        if(msg.type==="event") appendEvent(msg.data);
+        else if(msg.type==="done"){ es.close(); currentES=null; resolve(msg.data); }
+        else if(msg.type==="not_reviewed"){ es.close(); currentES=null; resolve({not_reviewed:true}); }
+        else if(msg.type==="error"){ es.close(); currentES=null; reject(new Error(msg.data)); }
+      };
+      es.onerror=()=>{ es.close(); currentES=null; reject(new Error(seenAny?"the agent stream was interrupted":"could not reach the backend stream")); };
+    });
+  }catch(e){
+    clearInterval(timerId);
+    settleAgents("stopped");
+    console.error("run_stream failed:", e);   // raw detail stays in the console, not on screen
+    const raw=String(e&&e.message||e);
+    const rate=/RESOURCE_EXHAUSTED|429|rate limit/i.test(raw);
+    const human=rate
+      ? "The AI service is temporarily rate-limited. Nothing was lost — give it a few seconds and run the case again."
+      : "The run was interrupted before it finished. Nothing was lost — please run the case again.";
+    $("#cbody").insertAdjacentHTML("beforeend",
+      `<div class="runnote warn rise in"><div class="rn-title">${rate?"Temporarily rate-limited":"Run interrupted"}</div>
+       <div class="rn-body">${human}</div>
+       <button class="btn primary sm" id="retryRunBtn">Run again</button></div>`);
+    const rbt=$("#retryRunBtn"); if(rbt) rbt.onclick=()=>renderCase(id);
+    return;
+  }
+  clearInterval(timerId);
+  settleAgents();
+
+  if(d.not_reviewed){
+    $("#loadwrap")?.remove();
+    $("#cbody").insertAdjacentHTML("beforeend", `<div class="resolve-card rise in">
+      <div class="rc-body">
+        <div class="rc-label">Awaiting Analyst review</div>
+        <div class="rc-action">Eleanor Ashworth hasn't opened this case yet — nothing has run, so there's nothing to approve.</div>
+      </div>
+    </div>`);
+    return;
+  }
+
+  const m=d.l1.metrics, confirmed=d.confirmed, D=dec(d.l1.decision);
+  let html=`<div class="verdict ${confirmed?'ok':''} rise in">
+    <div class="vv">${confirmed?'Scope expansion confirmed — negotiation triggered':D.l+' — '+d.l1.decision.replace(/_/g,' ')}</div>
+    <div class="vm">
+      <div>post/pre ratio<b>${m.post_pre_rate_ratio}×</b></div>
+      <div>geo cluster<b>${m.cluster_crossed?'yes':'no'}</b></div>
+      <div>post-remedy fails<b>${m.post_remedy_failures}</b></div>
+      <div>complaints<b>${m.raw_complaints}</b></div>
+    </div></div>`;
+  if(confirmed && d.l2){
+    _allocTarget=(d.l2.demand&&d.l2.demand.quantity)||60000;
+    html+=`<div id="allocMount"></div>`;
+  }
+  // Confirmed, but Layer 2 was paused by a transient rate limit. The verdict and the Part 573
+  // amendment are preserved; offer a clean retry to finish supplier sourcing — never a raw error.
+  else if(confirmed && d.l2_error){
+    html+=`<div class="runnote warn rise in">
+      <div class="rn-title">Supplier sourcing paused — ${d.l2_error.rate_limited?"temporarily rate-limited":"interrupted"}</div>
+      <div class="rn-body">Scope expansion is <b>confirmed</b> and the <b>Part 573 amendment has been drafted</b> (see Notifications). Only the supplier negotiation was interrupted. Run the case again to complete sourcing — nothing was lost.</div>
+      <button class="btn primary sm" id="retryRunBtn">Run again</button></div>`;
+  }
+  // Non-sourcing tags: the ResolutionAgent proposed an action — offer the in-case resolve button.
+  if(!confirmed && d.resolution){
+    const R=d.resolution;
+    html+=`<div class="resolve-card rise in" id="resolveCard">
+      <div class="rc-body">
+        <div class="rc-label">Recommended resolution</div>
+        <div class="rc-action">${R.recommended_action}</div>
+        ${R.owner?`<div class="rc-owner"><em></em>Routes to ${R.owner}</div>`:''}
+      </div>
+      <button class="btn primary" id="resolveBtn" ${AUTH&&AUTH.role==="Analyst"?"":"disabled title='Sign in as the Analyst to resolve this'"}>${R.action_label}</button>
+    </div>`;
+  }
+  $("#cbody").insertAdjacentHTML("beforeend", html);
+  animateIn($("#cbody"));
+  const rb=$("#resolveBtn");
+  if(rb) rb.onclick=()=>resolveCase(id, d.resolution, rb);
+  const rbt=$("#retryRunBtn");
+  if(rbt) rbt.onclick=()=>renderCase(id);
+  if(confirmed && d.l2) renderAllocation(id);
+}
+
+let _allocTarget=60000;
+/* Re-renders the allocation from the LIVE ledger — so after a decline re-sources to the
+   reserve supplier, that backfill appears as a commitment with its own Call button, and
+   no PO is drafted until that supplier is confirmed by call (same rule as the primaries). */
+async function renderAllocation(id){
+  const mount=document.getElementById("allocMount"); if(!mount) return;
+  const isAnalyst = AUTH && AUTH.role==="Analyst";
+  let commits=[], doneSup={}, escalation=null;
+  try{
+    commits=((await (await fetch(`${API}/api/commitments/${id}`)).json()).commitments)||[];
+    const nz=((await (await fetch(`${API}/api/notifications`)).json()).notifications)||[];
+    nz.forEach(n=>{ if(n.case_id===id){
+      if(n.type==="po_draft" && n.supplier_id) doneSup[n.supplier_id]="confirmed";
+      if(n.type==="escalation") escalation=n;
+    }});
+  }catch(e){}
+  const totalCost=commits.reduce((a,c)=>a+c.quantity*c.unit_price,0);
+  const totalUnits=commits.reduce((a,c)=>a+c.quantity,0);
+  const short=(_allocTarget||0)-totalUnits;
+  const callCell=(c)=> !isAnalyst ? `<span class="muted-note">—</span>`
+    : doneSup[c.supplier_id]==="confirmed" ? `<span class="confirmed-note">${checkIcon} Confirmed by call</span>`
+    : `<button class="btn sm callbtn" data-cmt="${c.commitment_id}" data-sup="${c.supplier_id}">${phoneIcon} Call to confirm</button>`;
+  mount.innerHTML=`<div class="alloc">
+    <h3>Negotiated allocation — ${short<=0?'demand fully met':short.toLocaleString()+' units short'} · ${money(totalCost)} total</h3>
+    <p class="alloc-hint">${isAnalyst?'The agent negotiated these deals and is ready to confirm each by phone. Click <b>Call to confirm</b> to place the real call.':'The Analyst confirms these deals by phone before a PO is drafted.'}</p>
+    <table><thead><tr><th>Supplier</th><th>Units</th><th>Unit price</th><th>Status</th><th></th></tr></thead><tbody>
+    ${commits.map(c=>`<tr><td>${c.supplier_id}${c.status==='Re-committed'?` <span class="backfill-badge">backfill</span>`:''}</td><td class="num">${c.quantity.toLocaleString()}</td><td class="num">${money(c.unit_price)}</td><td>${c.status}</td><td class="callcell">${callCell(c)}</td></tr>`).join("")}
+    </tbody></table>
+    ${escalation?`<div class="alloc-escalation">\u26a0 ${escalation.detail}</div>`:''}
+  </div>`;
+  mount.querySelectorAll(".callbtn").forEach(b=>{ b.onclick=()=>placeCall(id, b); });
+}
+
+/* ---- Analyst places the REAL confirmation call to a supplier ---- */
+async function placeCall(caseId, btn){
+  const cmtId=btn.dataset.cmt, supId=btn.dataset.sup, orig=btn.innerHTML;
+  // mark where the timeline is NOW so the drawer only shows THIS call's turns, not prior suppliers'
+  let startSeq=0;
+  try{ const t=await (await fetch(`${API}/api/timeline/${caseId}`)).json(); startSeq=(t.timeline||[]).reduce((m,e)=>Math.max(m,e.seq||0),0); }catch(e){}
+  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:14px;height:14px;border-width:2px"></span> Dialing…`;
+  let res;
+  try{ res=await (await fetch(`${API}/api/call/${caseId}/${cmtId}`,{method:"POST",headers:{"Content-Type":"application/json",...authHeaders()}})).json(); }
+  catch(e){ btn.disabled=false; btn.innerHTML=orig; alert("Could not place the call: "+e.message); return; }
+  if(res.error){ btn.disabled=false; btn.innerHTML=orig; alert(res.error); return; }
+  btn.innerHTML=`${phoneIcon} ${res.mode==='twilio'?'Ringing…':'Simulated'}`;
+  openCallDrawer(caseId, cmtId, supId, res, btn, startSeq);
+}
+
+function openCallDrawer(caseId, cmtId, supId, res, btn, startSeq){
+  const live = res.mode==='twilio';
+  openDrawer(`<div class="dhd"><div><div class="dk po">Supplier confirmation call</div><h2>Calling ${supId}</h2></div>
+    <button class="dclose" aria-label="Close">&times;</button></div>
+    <div class="dbody">
+      <div class="callstatus" id="callStatus">${live?`${phoneIcon} Your phone is ringing — answer and confirm the order in your own words.`:`Simulated call — no Twilio credentials on this machine.`}</div>
+      <div class="dlabel">Live transcript</div>
+      <div class="tscript" id="callScript"><div class="muted-note" style="padding:12px">Waiting for the conversation…</div></div>
+    </div>`);
+  let done=false, ticks=0, lastOutcome="";
+  async function poll(){
+    ticks++;
+    const el=document.getElementById("callScript"); if(!el) return; // drawer closed
+    try{
+      const d=await (await fetch(`${API}/api/timeline/${caseId}`)).json();
+      const calls=(d.timeline||[]).filter(e=>e.phase==="call" && (e.seq||0) > (startSeq||0));
+      if(calls.length){
+        el.innerHTML=calls.map(e=>{
+          const agent=/agent/i.test(e.actor||"");
+          const tag=(e.outcome&&e.outcome!=='ringing')?` <span class="foutcome ${outcomeTone(e.outcome)}">${String(e.outcome).replace(/_/g,' ')}</span>`:'';
+          if(e.outcome && /confirmed/.test(String(e.outcome))){ done=true; lastOutcome="confirmed"; }
+          else if(e.outcome && /declined/.test(String(e.outcome))){ done=true; lastOutcome="declined"; }
+          return `<div class="tturn ${agent?'agent':''}"><span class="tw">${agent?'Agent':(e.actor||'').replace(' (supplier)','')}</span><span class="tx">${e.text||''}${tag}</span></div>`;
+        }).join("");
+      }
+      if(done){
+        const st=document.getElementById("callStatus");
+        if(st) st.innerHTML = lastOutcome==="declined"
+          ? `${checkIcon} Supplier declined — the agent re-sourced the gap to the reserve supplier. Confirm the backfill in the allocation below (or review the escalation in Notifications).`
+          : `${checkIcon} Call complete — the purchase order has been drafted and sent to the Approver.`;
+        refreshNavBadge();
+        if(btn){ btn.disabled=true; btn.innerHTML = lastOutcome==="declined" ? `Declined` : `${checkIcon} Confirmed`; btn.classList.add("done"); }
+        renderAllocation(caseId);
+        return;
+      }
+    }catch(e){}
+    if(ticks<70 && !done && document.getElementById("callScript")) setTimeout(poll, 2000);
+    else if(!done && document.getElementById("callStatus")){
+      const st=document.getElementById("callStatus");
+      st.classList.add("callwarn");
+      st.innerHTML=`The call didn't complete with a clear confirmation (no answer, voicemail, or an unclear reply). Close this and place the call again.`;
+      if(btn){ btn.disabled=false; btn.innerHTML=`${phoneIcon} Call to confirm`; }
+    }
+  }
+  poll();
+}
+
+async function resolveCase(id, R, btn){
+  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:16px;height:16px;border-width:2px"></span> Resolving…`;
+  try{
+    const resp=await fetch(`${API}/api/resolve/${id}`,{method:"POST",headers:{"Content-Type":"application/json",...authHeaders()},
+      body:JSON.stringify({action:R.action_label, owner:R.owner, decision:R.decision})});
+    if(resp.status===401||resp.status===403){ signOut(); return; }
+    const card=$("#resolveCard");
+    card.classList.add("done");
+    card.innerHTML=`<div class="rc-body"><span class="sentmark">${checkIcon} Resolved — ${R.action_label}${R.owner?` · ${R.owner}`:''}</span>
+      <div class="rc-owner" style="color:var(--ink-3)">Logged to the audit trail and moved to Resolved.</div></div>
+      <a class="btn primary" href="#/resolved" style="text-decoration:none">View in Resolved</a>`;
+  }catch(e){ btn.disabled=false; btn.textContent=R.action_label; alert("Could not resolve: "+e.message); }
+}
+
+renderWho();
+router();
+refreshNavBadge();
+setInterval(refreshNavBadge, 15000);
+</script>
+</body>
+</html>

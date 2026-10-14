@@ -1,0 +1,93 @@
+<mxfile host="app.diagrams.net" modified="2026-10-12T00:00:00.000Z" agent="RemedyMesh" version="24.0.0">
+  <diagram name="Remedy Mesh - GCP Architecture" id="remedymesh-gcp">
+    <mxGraphModel dx="1600" dy="1040" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1060" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Remedy Mesh — Google Cloud Architecture (services &amp; data flow)" style="text;html=1;fontSize=18;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1520" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Google Cloud project boundary -->
+        <mxCell id="boundary" value="Google Cloud  ·  &lt;your-gcp-project-id&gt;  (region: asia-south1)" style="rounded=1;fillColor=#F8FBFF;strokeColor=#4285F4;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#1A73E8;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="240" y="80" width="1260" height="880" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Solid = core (build now)   ·   Dashed = optional technicality flex   ·   Red = external (non-GCP)" style="text;html=1;fontSize=11;fontColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="250" y="920" width="900" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Actor ===== -->
+        <mxCell id="user" value="&lt;b&gt;Quality Engineer / Judge&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;opens the app in a browser&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#607D8B;" vertex="1" parent="1">
+          <mxGeometry x="70" y="430" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Deploy pipeline (top) ===== -->
+        <mxCell id="build" value="&lt;b&gt;Cloud Build&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;builds the container&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;fontColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="300" y="120" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="registry" value="&lt;b&gt;Artifact Registry&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;stores the image&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;fontColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="520" y="120" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Frontend ===== -->
+        <mxCell id="hosting" value="&lt;b&gt;Firebase Hosting&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;4 demo screens (React)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFA000;fontColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="290" y="430" width="170" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Cloud Run (central compute) ===== -->
+        <mxCell id="run" value="&lt;b&gt;Cloud Run&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;the ONLY backend — runs the ADK multi-agent service&lt;br&gt;&lt;br&gt;Layer 1 (SequentialAgent): Interpreter → Match → Resolution → Verification&lt;br&gt;Layer 2 (Parallel + Loop): OEM + isolated suppliers → ledger → selective reneg&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285F4;fontColor=#ffffff;strokeColor=none;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="540" y="360" width="260" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- ===== AI ===== -->
+        <mxCell id="vertex" value="&lt;b&gt;Vertex AI — Gemini 2.5&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Flash + Pro — the 5 reasoning agents&lt;br&gt;(function calling + streaming)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#673AB7;fontColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="880" y="300" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="vector" value="&lt;b&gt;Vertex AI Vector Search&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;cross-OEM defect-signature match&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#673AB7;fontColor=#ffffff;strokeColor=none;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="410" width="210" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Data ===== -->
+        <mxCell id="firestore" value="&lt;b&gt;Cloud Firestore&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;live DB the agents query:&lt;br&gt;cases · complaints · lots · suppliers · commitments&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A73E8;fontColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="300" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="bq" value="&lt;b&gt;BigQuery&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;complaint analytics at scale (optional)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A73E8;fontColor=#ffffff;strokeColor=none;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="410" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ===== Integrations / Ops ===== -->
+        <mxCell id="places" value="&lt;b&gt;Maps Platform — Places API&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Resolution Loop: find the service center&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#34A853;fontColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="880" y="620" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="secret" value="&lt;b&gt;Secret Manager&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;API keys / Twilio creds&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#5F6368;fontColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="620" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="logging" value="&lt;b&gt;Cloud Logging / Trace&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;the 'agent visibly working' feed&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#5F6368;fontColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="540" y="620" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ===== External ===== -->
+        <mxCell id="twilio" value="&lt;b&gt;Twilio (external)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;voice fallback call — optional&lt;br&gt;webhook = Cloud Run URL (no ngrok in prod)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F22F46;fontColor=#ffffff;strokeColor=none;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="810" width="210" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ===== EDGES ===== -->
+        <mxCell id="e_u_h" value="opens app" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" edge="1" parent="1" source="user" target="hosting"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_h_r" value="HTTPS / REST + SSE stream" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;" edge="1" parent="1" source="hosting" target="run"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_b_reg" value="push" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" edge="1" parent="1" source="build" target="registry"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_reg_run" value="deploy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="registry" target="run"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_run_vertex" value="agent reasoning (Gemini)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;" edge="1" parent="1" source="run" target="vertex"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_run_vector" value="similarity match" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;dashed=1;" edge="1" parent="1" source="run" target="vector"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_run_fs" value="query + write (cases, commitments)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;" edge="1" parent="1" source="run" target="firestore"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="820" y="340"/></Array></mxGeometry></mxCell>
+        <mxCell id="e_fs_bq" value="export" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="firestore" target="bq"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_run_places" value="find service center" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" edge="1" parent="1" source="run" target="places"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_run_secret" value="fetch keys" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" edge="1" parent="1" source="run" target="secret"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="820" y="655"/><mxPoint x="1050" y="655"/></Array></mxGeometry></mxCell>
+        <mxCell id="e_run_log" value="activity feed" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" edge="1" parent="1" source="run" target="logging"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_run_twilio" value="voice fallback (optional)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;dashed=1;strokeColor=#F22F46;" edge="1" parent="1" source="places" target="twilio"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

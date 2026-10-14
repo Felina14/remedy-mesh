@@ -1,0 +1,53 @@
+[
+  {
+    "party_id": "OEM",
+    "party_name": "Isar Automobile",
+    "role": "oem",
+    "target_units": 60000,
+    "deadline_weeks": 12,
+    "max_unit_cost": 128.0,
+    "private_note": "target_units derived at runtime from the confirmed expanded scope (LOT-4471 replacement demand); ceiling is private. No single supplier can cover this within the window after backlog -> a split is forced.",
+    "visible_to": [
+      "OEM"
+    ]
+  },
+  {
+    "party_id": "SUP_A",
+    "party_name": "Haldane Components",
+    "role": "supplier",
+    "capacity_units_per_week": 3200,
+    "unit_cost": 118.5,
+    "lead_time_weeks": 3,
+    "existing_backlog_units": 5400,
+    "min_order_units": 2000,
+    "visible_to": [
+      "SUP_A"
+    ]
+  },
+  {
+    "party_id": "SUP_B",
+    "party_name": "Correns Manufacturing",
+    "role": "supplier",
+    "capacity_units_per_week": 2600,
+    "unit_cost": 124.75,
+    "lead_time_weeks": 2,
+    "existing_backlog_units": 2100,
+    "min_order_units": 1500,
+    "visible_to": [
+      "SUP_B"
+    ]
+  },
+  {
+    "party_id": "SUP_C",
+    "party_name": "Ridgeline Precision",
+    "role": "supplier",
+    "capacity_units_per_week": 1500,
+    "unit_cost": 131.0,
+    "lead_time_weeks": 1,
+    "existing_backlog_units": 800,
+    "min_order_units": 1000,
+    "visible_to": [
+      "SUP_C"
+    ]
+  }
+]

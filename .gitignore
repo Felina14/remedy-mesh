@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Secrets / env — NEVER commit
+.env
+.env.*
+*.env
+backend.env
+*.pem
+*.key
+service-account*.json
+credentials*.json
+client_secret*.json
+
+# Node tooling (local screenshot/verification only)
+node_modules/
+package-lock.json
+
+# Runtime artifacts
+*.log
+remedy_pos/
+*.pdf
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Generator byproducts (keep input/, drop large expected outputs)
+remedy_mesh_synthetic_data/expected_outputs/

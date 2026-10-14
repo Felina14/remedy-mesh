@@ -1,0 +1,58 @@
+[
+  {
+    "ts": "2026-10-09T09:00:00",
+    "case_id": "CASE-001",
+    "actor": "agent",
+    "action": "threshold_check",
+    "detail": "Post-remedy complaint rate in lot range crossed 2.5x baseline — evidence check started.",
+    "outcome": "triggered"
+  },
+  {
+    "ts": "2026-10-09T09:02:00",
+    "case_id": "CASE-001",
+    "actor": "agent",
+    "action": "vin_match",
+    "detail": "Cross-referenced 260 complaint VINs against campaign 24V-104 scope.",
+    "outcome": "214/260 matched ✔"
+  },
+  {
+    "ts": "2026-10-09T09:04:00",
+    "case_id": "CASE-001",
+    "actor": "agent",
+    "action": "duplicate_check",
+    "detail": "Checked for duplicate/resubmitted complaints.",
+    "outcome": "passed ✔"
+  },
+  {
+    "ts": "2026-10-09T09:06:00",
+    "case_id": "CASE-001",
+    "actor": "agent",
+    "action": "places_lookup",
+    "detail": "Queried Places API for the service center that worked lot 4471.",
+    "outcome": "located: Maple Ridge Isar (NC)"
+  },
+  {
+    "ts": "2026-10-09T09:09:00",
+    "case_id": "CASE-001",
+    "actor": "agent",
+    "action": "record_lookup",
+    "detail": "Cross-referenced the dealer production/service record for lot 4471.",
+    "outcome": "record located"
+  },
+  {
+    "ts": "2026-10-09T09:12:00",
+    "case_id": "CASE-001",
+    "actor": "agent",
+    "action": "record_obtained",
+    "detail": "Record obtained: Lot #4471, installed 2024-03-12.",
+    "outcome": "install_date: confirmed ✔"
+  },
+  {
+    "ts": "2026-10-09T09:13:00",
+    "case_id": "CASE-001",
+    "actor": "agent",
+    "action": "scope_confirmed",
+    "detail": "All 4 evidence checks passed — scope expansion confirmed.",
+    "outcome": "Scope confirmed — negotiation triggered"
+  }
+]

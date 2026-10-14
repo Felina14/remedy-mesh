@@ -1,0 +1,152 @@
+[
+  {
+    "commitment_id": "CMT-001",
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "quantity": 3000,
+    "unit_price": 119.75,
+    "date": "2026-10-09",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-10-09T09:14:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-002",
+    "case_id": "CASE-001",
+    "party_id": "SUP_B",
+    "quantity": 2400,
+    "unit_price": 125.5,
+    "date": "2026-10-09",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-10-09T09:14:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-003",
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "quantity": 1200,
+    "unit_price": 116.24,
+    "date": "2026-09-30",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-09-30T10:00:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-004",
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "quantity": 2000,
+    "unit_price": 122.24,
+    "date": "2026-10-08",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-10-08T10:00:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-005",
+    "case_id": "CASE-001",
+    "party_id": "SUP_B",
+    "quantity": 2000,
+    "unit_price": 119.38,
+    "date": "2026-09-22",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-09-22T10:00:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-006",
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "quantity": 2000,
+    "unit_price": 122.89,
+    "date": "2026-09-28",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-09-28T10:00:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-007",
+    "case_id": "CASE-001",
+    "party_id": "SUP_B",
+    "quantity": 2000,
+    "unit_price": 133.76,
+    "date": "2026-09-30",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-09-30T10:00:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-008",
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "quantity": 800,
+    "unit_price": 128.27,
+    "date": "2026-10-04",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-10-04T10:00:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-009",
+    "case_id": "CASE-001",
+    "party_id": "SUP_B",
+    "quantity": 800,
+    "unit_price": 129.89,
+    "date": "2026-10-02",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-10-02T10:00:00",
+        "status": "Committed"
+      }
+    ]
+  },
+  {
+    "commitment_id": "CMT-010",
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "quantity": 2000,
+    "unit_price": 130.62,
+    "date": "2026-10-05",
+    "status": "Committed",
+    "status_history": [
+      {
+        "ts": "2026-10-05T10:00:00",
+        "status": "Committed"
+      }
+    ]
+  }
+]

@@ -1,0 +1,103 @@
+<mxfile host="app.diagrams.net" agent="RemedyMesh">
+  <diagram name="Remedy Mesh - GCP (official icons)" id="remedymesh-gcp-icons">
+    <mxGraphModel dx="1572" dy="1030" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;fontSize=18;fontStyle=1;align=center;" value="Remedy Mesh — Google Cloud Architecture (official GCP icons)" vertex="1">
+          <mxGeometry height="30" width="1520" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" parent="1" style="rounded=1;fillColor=#F8FBFF;strokeColor=#4285F4;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#1A73E8;fontSize=13;" value="Google Cloud  ·  &lt;your-gcp-project-id&gt;  ·  region asia-south1" vertex="1">
+          <mxGeometry height="900" width="1280" x="240" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="text;html=1;fontSize=11;fontColor=#666666;align=left;" value="Solid = core (build now)   ·   Dashed = optional technicality flex   ·   Red = external (non-GCP)" vertex="1">
+          <mxGeometry height="20" width="900" x="250" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="user" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.user;fontSize=11;" value="Quality Engineer / Judge" vertex="1">
+          <mxGeometry height="55" width="45" x="90" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="build" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.cloud_build;fontSize=11;" value="Cloud Build&lt;br&gt;builds container" vertex="1">
+          <mxGeometry height="60" width="60" x="330" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="registry" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.container_registry;fontSize=11;" value="Artifact Registry&lt;br&gt;stores image" vertex="1">
+          <mxGeometry height="60" width="60" x="560" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="hosting" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFA000;fontColor=#ffffff;strokeColor=none;" value="&lt;b&gt;Firebase Hosting&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;4 demo screens (React)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="65" width="160" x="290" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="run" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.cloud_run;fontSize=11;" value="Cloud Run&lt;br&gt;&lt;b&gt;ADK multi-agent service&lt;/b&gt;&lt;br&gt;Layer 1 (Sequential) + Layer 2 (Parallel/Loop)" vertex="1">
+          <mxGeometry height="70" width="70" x="610" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="vertex" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.ai_platform;fontSize=11;" value="Vertex AI — Gemini 2.5&lt;br&gt;5 agents (Flash + Pro)" vertex="1">
+          <mxGeometry height="60" width="60" x="930" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="vector" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.ai_platform;fontSize=11;dashed=1;" value="Vertex AI Vector Search&lt;br&gt;cross-OEM match (optional)" vertex="1">
+          <mxGeometry height="60" width="60" x="930" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="firestore" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.cloud_firestore;fontSize=11;" value="Cloud Firestore&lt;br&gt;live DB the agents query" vertex="1">
+          <mxGeometry height="60" width="60" x="1230" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="bq" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.bigquery;fontSize=11;dashed=1;" value="BigQuery&lt;br&gt;complaint analytics (optional)" vertex="1">
+          <mxGeometry height="60" width="60" x="1230" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="places" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#34A853;fontColor=#ffffff;strokeColor=none;" value="&lt;b&gt;Maps Platform — Places API&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;Resolution Loop lookup&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="900" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="secret" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.key_management_service;fontSize=11;" value="Secret Manager&lt;br&gt;API keys / creds" vertex="1">
+          <mxGeometry height="60" width="60" x="1240" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="logging" parent="1" style="sketch=0;html=1;verticalLabelPosition=bottom;verticalAlign=top;align=center;shape=mxgraph.gcp2.cloud_logging;fontSize=11;" value="Cloud Logging / Trace&lt;br&gt;the &#39;agent visibly working&#39; feed" vertex="1">
+          <mxGeometry height="60" width="60" x="620" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="twilio" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F22F46;fontColor=#ffffff;strokeColor=none;dashed=1;" value="&lt;b&gt;Twilio (external)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;voice fallback — webhook = Cloud Run URL (no ngrok in prod)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="210" x="900" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="e_u_h" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" target="hosting" value="opens app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_h_r" edge="1" parent="1" source="hosting" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;" target="run" value="HTTPS / REST + SSE">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_b_reg" edge="1" parent="1" source="build" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" target="registry" value="push">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_reg_run" edge="1" parent="1" source="registry" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;" target="run" value="deploy">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_run_vertex" edge="1" parent="1" source="run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;" target="vertex" value="agent reasoning (Gemini)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_run_vector" edge="1" parent="1" source="run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;dashed=1;" target="vector" value="similarity match">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_run_fs" edge="1" parent="1" source="run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;" target="firestore" value="query + write">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="860" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_fs_bq" edge="1" parent="1" source="firestore" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;" target="bq" value="export">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_run_places" edge="1" parent="1" source="run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" target="places" value="find service center">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_run_secret" edge="1" parent="1" source="run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" target="secret" value="fetch keys">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="860" y="650" />
+              <mxPoint x="1120" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_run_log" edge="1" parent="1" source="run" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;" target="logging" value="activity feed">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_places_twilio" edge="1" parent="1" source="places" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;startArrow=block;endArrow=block;dashed=1;strokeColor=#F22F46;" target="twilio" value="voice fallback (optional)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,20 @@
+# Keep the Cloud Build upload lean and secret-free.
+.git/
+**/.venv/
+.venv/
+**/__pycache__/
+**/*.pyc
+*.log
+.DS_Store
+**/.DS_Store
+
+# Never upload local secrets / env files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Not needed in the image (the Dockerfile copies only what it needs)
+remedy_mesh_synthetic_data/expected_outputs/
+remedy_mesh_synthetic_data/*.drawio
+node_modules/

@@ -1,0 +1,62 @@
+[
+  {
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "round": 1,
+    "ts": "2026-10-09T09:14:00",
+    "type": "propose",
+    "quantity": 3000,
+    "unit_price": 121.0,
+    "status": "proposing"
+  },
+  {
+    "case_id": "CASE-001",
+    "party_id": "SUP_B",
+    "round": 2,
+    "ts": "2026-10-09T09:17:00",
+    "type": "propose",
+    "quantity": 2400,
+    "unit_price": 127.0,
+    "status": "proposing"
+  },
+  {
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "round": 3,
+    "ts": "2026-10-09T09:20:00",
+    "type": "counter",
+    "quantity": 3000,
+    "unit_price": 119.75,
+    "status": "countering"
+  },
+  {
+    "case_id": "CASE-001",
+    "party_id": "SUP_B",
+    "round": 4,
+    "ts": "2026-10-09T09:23:00",
+    "type": "counter",
+    "quantity": 2400,
+    "unit_price": 125.5,
+    "status": "countering"
+  },
+  {
+    "case_id": "CASE-001",
+    "party_id": "SUP_A",
+    "round": 5,
+    "ts": "2026-10-09T09:26:00",
+    "type": "accept",
+    "quantity": 3000,
+    "unit_price": 119.75,
+    "status": "committed"
+  },
+  {
+    "case_id": "CASE-001",
+    "party_id": "SUP_B",
+    "round": 6,
+    "ts": "2026-10-09T09:29:00",
+    "type": "accept",
+    "quantity": 2400,
+    "unit_price": 125.5,
+    "status": "committed"
+  }
+]

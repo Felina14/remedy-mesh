@@ -1,0 +1,10 @@
+# Pinned to the exact versions tested in the working .venv, so a fresh Cloud Run
+# build can never silently drift to an untested release (notably google-adk, which
+# the Layer 2 negotiation agents depend on for tools).
+google-adk==2.11.0
+fastapi==0.141.1
+uvicorn[standard]==0.54.0
+twilio==9.12.0
+reportlab==5.0.1
+# Optional: only imported when REMEDY_BACKEND=firestore (the demo uses the bundled JSON corpus).
+google-cloud-firestore>=2.16.0

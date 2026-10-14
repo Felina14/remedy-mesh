@@ -1,0 +1,34 @@
+{
+  "policy_version": "2026.10",
+  "description": "Evidence-sufficiency and reportability rules the deterministic layer and Verification agent apply. Case-agnostic: contains thresholds, not answers.",
+  "open_case_rules": {
+    "min_complaints_to_open": 12,
+    "post_remedy_rate_multiplier_over_baseline": 2.5,
+    "min_post_remedy_failures": 20,
+    "duplicate_window_days": 30
+  },
+  "cluster_rules": {
+    "cluster_min_complaints": 8,
+    "cluster_radius_km": 300,
+    "independent_of_raw_count": true
+  },
+  "evidence_sufficiency_criteria": [
+    "vin_match",
+    "lot_match",
+    "scope_drift_shown",
+    "install_date_confirmed",
+    "duplicate_cleared",
+    "threshold_crossed"
+  ],
+  "reportability": {
+    "part_573_reportable_if": "scope_drift_shown AND threshold_crossed AND safety_critical_component",
+    "safety_critical_components": [
+      "Integrated Brake Module",
+      "HV Battery Contactor",
+      "Airbag Inflator",
+      "Seatbelt Pretensioner",
+      "Steering Rack Sensor"
+    ]
+  },
+  "note": "A case is CONFIRMED (and may trigger the negotiation mesh) only when every required evidence_sufficiency_criteria item is met on real records. Missing any -> stay open / keep chasing / or close as no-signal. Never confirm on a missing criterion."
+}

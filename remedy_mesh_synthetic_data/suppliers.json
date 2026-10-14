@@ -1,0 +1,31 @@
+[
+  {
+    "party_id": "OEM",
+    "party_name": "Isar Automobile",
+    "role": "oem",
+    "demand_units": 40000,
+    "visible_to": [
+      "OEM"
+    ]
+  },
+  {
+    "party_id": "SUP_A",
+    "party_name": "Haldane Components",
+    "role": "supplier",
+    "capacity_units_per_week": 3200,
+    "unit_cost": 118.5,
+    "visible_to": [
+      "SUP_A"
+    ]
+  },
+  {
+    "party_id": "SUP_B",
+    "party_name": "Correns Manufacturing",
+    "role": "supplier",
+    "capacity_units_per_week": 2600,
+    "unit_cost": 124.75,
+    "visible_to": [
+      "SUP_B"
+    ]
+  }
+]
