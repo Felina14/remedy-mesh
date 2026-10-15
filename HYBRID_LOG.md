@@ -118,6 +118,15 @@ The original app has the old wording.
 (several / one / no alternatives, offer far above the ceiling), and 0 of 12 on the deployed
 agent after updating it in place.
 
+### 3.18 The page never errors when you switch pages mid-load
+**File:** `frontend/index.html`
+Several screens fetch data, wait, then write into a panel without checking it is still on
+screen. Switching pages during that wait made the browser log errors (nothing visible broke).
+Fixed with: a `$live()` helper for those writes, a render id on the case page so an abandoned
+case stops after every wait (also when jumping from one case to another), and null-safe
+fade-in and list wiring. The original app has the same pattern.
+**Verified:** 150 rapid page switches across both personas → **0 JavaScript errors**.
+
 ### 3.17 Resilience to Gemini capacity refusals (429)
 **Files:** `config.py`, `remote_agents.py`, `pipeline.py`, `resolution.py`, `layer2.py`, `update_agents.py`, Cloud Run timeout.
 Under heavy shared demand, Gemini on Vertex answers `429 RESOURCE_EXHAUSTED` (Google's shared
@@ -301,7 +310,19 @@ deterministic verdict every time, and there were no errors, rate limits or fallb
 | SUP_B decline | "No, I can't do that. Sorry." | declined · 0 (2.8 s) | live re-source: Ridgeline $157.20 → countered → $131 |
 | SUP_C confirm | "Yeah, we can do that. December 3rd." | confirmed · 27,000 @ $131, kept the date (1.95 s) | PO draft for Ridgeline |
 
-### 4.3 Approver flow (browser, cloud)
+### 4.3 Full end-to-end test on `remedymesh` (final)
+- **All 9 cases:** every case ran all three Layer-1 agents, the Verifier agreed every time, the
+  three confirmed cases negotiated SUP_A + SUP_B at $128, the six others got agent-written
+  reasoning; 38–92 s per case; no errors, timeouts or fallbacks.
+- **Live calls:** SUP_A confirmed ("Yeah, yes, we can do that. Please arrange.") → PO draft;
+  SUP_B declined ("I'm sorry we don't have capacity") → live re-source, Ridgeline $150.65 →
+  countered → $131; Ridgeline confirmed → PO draft.
+- **Personas (browser, real sign-in form):** 22 of 22 role and action checks passed — Eleanor
+  proposes (escalate CASE-009, set watch CASE-006), cannot approve; James cannot place calls,
+  approves the escalation, returns CASE-006, acknowledges the decline, sends both POs, files the
+  Part 573; CASE-001 and CASE-009 resolve, CASE-006 stays open and can be proposed again.
+
+### 4.4 Approver flow (browser, cloud — earlier, on the hybrid service)
 Eleanor ran CASE-009 → **Escalate to engineering** → proposal created, no sign-in bounce. James then:
 approved the escalation (case resolved), **filed** the Part 573 (real email), **sent** the Ridgeline
 PO (real email with PDF). CASE-001 and CASE-009 moved to Resolved; active 9 → 7; no JS errors.
@@ -372,6 +393,13 @@ PO (real email with PDF). CASE-001 and CASE-009 moved to Resolved; active 9 → 
 - **Main branch history** still contains an old project ID (in the seed script) and the live URL
   with the project number; rewrite or scrub before the repository is made public.
 - **Budget alert** at ₹400 versus ≈ ₹80/day idle (see §5).
+
+- **Cloud Run can recycle the container at any time** (seen once, with no deploy behind it), and
+  all workflow state is in memory, so a case in progress is lost when that happens. The original
+  app has the same exposure. The real fix is keeping workflow state in Firestore (roadmap 2).
+- **The phone agent sometimes asks one extra "Is that correct?"** after a plain yes. If the
+  supplier hangs up before answering, no PO is drafted. Answer the follow-up on camera, or tighten
+  the instruction so a yes to terms already stated on the call closes it.
 
 ## 9. Roadmap ideas
 

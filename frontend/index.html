@@ -733,7 +733,10 @@ function outcomeTone(o){
   if(s==="no_mesh") return "mut";
   return "accent";
 }
-function animateIn(scope=document){requestAnimationFrame(()=>{let i=0;scope.querySelectorAll(".rise").forEach(e=>{e.style.transitionDelay=(i++*45)+"ms";e.classList.add("in");});});}
+// After an await the user may already be on another page, so a render target can be gone.
+// Writing to it then is a no-op instead of a console error.
+const $live=sel=>document.querySelector(sel)||{set innerHTML(v){}};
+function animateIn(scope=document){if(!scope) return; requestAnimationFrame(()=>{let i=0;scope.querySelectorAll(".rise").forEach(e=>{e.style.transitionDelay=(i++*45)+"ms";e.classList.add("in");});});}
 function highlightMoney(text){ return text.replace(/\$[\d,]+(?:\.\d+)?/g, m=>`<span class="fbid">${m}</span>`); }
 function evidenceBlock(meta){
   if(!meta || !meta.criteria) return "";
@@ -834,12 +837,12 @@ async function renderNotifications(){
       <div class="nsub" id="nsub"></div></div>
     <div id="nbody"></div></div>`;
   animateIn(v);
-  if(!(await conn())){ $("#nbody").innerHTML=`<div class="nempty rise in"><div class="ei">${NIC.sent}</div><h3>Backend offline</h3></div>`; return; }
+  if(!(await conn())){ $live("#nbody").innerHTML=`<div class="nempty rise in"><div class="ei">${NIC.sent}</div><h3>Backend offline</h3></div>`; return; }
   const d=await (await fetch(API+"/api/notifications")).json();
   refreshNavBadge();
   const items=d.notifications||[];
   const c=d.counts||{};
-  $("#nsub").innerHTML=`<span><b>${d.pending||0}</b> awaiting you</span>`+
+  $live("#nsub").innerHTML=`<span><b>${d.pending||0}</b> awaiting you</span>`+
     `<span><b>${c.pending_po||0}</b> PO drafts</span>`+
     `<span><b>${c.resolution_proposal||0}</b> resolutions</span>`+
     `<span><b>${c.part573_draft||0}</b> Part 573 amendments</span>`+
@@ -847,7 +850,7 @@ async function renderNotifications(){
     `<span><b>${c.escalation||0}</b> escalations</span>`;
 
   if(!items.length){
-    $("#nbody").innerHTML=`<div class="nempty rise in"><div class="ei">${NIC.po_draft}</div>
+    $live("#nbody").innerHTML=`<div class="nempty rise in"><div class="ei">${NIC.po_draft}</div>
       <h3>No notifications yet</h3>
       <div style="max-width:40ch">When a supplier confirms on a call, the draft purchase order lands here for your approval.</div></div>`;
     animateIn($("#nbody")); return;
@@ -857,8 +860,8 @@ async function renderNotifications(){
   let html="";
   if(pending.length) html+=`<div class="nsect rise"><h2>Needs your action</h2>${pending.map(cardHTML).join("")}</div>`;
   if(done.length) html+=`<div class="nsect rise"><h2>Sent &amp; cleared</h2>${done.map(cardHTML).join("")}</div>`;
-  $("#nbody").innerHTML=html;
-  $("#nbody").querySelectorAll(".ncard").forEach(cel=>{
+  $live("#nbody").innerHTML=html;
+  ($("#nbody")?.querySelectorAll(".ncard")||[]).forEach(cel=>{
     cel.onclick=()=>openNotif(cel.dataset.id);
   });
   animateIn($("#nbody"));
@@ -900,17 +903,17 @@ async function renderResolved(){
       <div class="nsub" id="rsub"></div></div>
     <div id="rbody"></div></div>`;
   animateIn(v);
-  if(!(await conn())){ $("#rbody").innerHTML=`<div class="nempty rise in"><div class="ei">${icLock}</div><h3>Backend offline</h3></div>`; return; }
+  if(!(await conn())){ $live("#rbody").innerHTML=`<div class="nempty rise in"><div class="ei">${icLock}</div><h3>Backend offline</h3></div>`; return; }
   const d=await (await fetch(API+"/api/resolved")).json();
   const rows=d.resolved||[];
-  $("#rsub").innerHTML=`<span><b>${d.total||0}</b> resolved</span>`;
+  $live("#rsub").innerHTML=`<span><b>${d.total||0}</b> resolved</span>`;
   if(!rows.length){
-    $("#rbody").innerHTML=`<div class="nempty rise in"><div class="ei">${checkIcon}</div>
+    $live("#rbody").innerHTML=`<div class="nempty rise in"><div class="ei">${checkIcon}</div>
       <h3>Nothing resolved yet</h3><div style="max-width:42ch">When you send a PO or resolve a case, it lands here with its full audit trail.</div></div>`;
     animateIn($("#rbody")); return;
   }
-  $("#rbody").innerHTML=`<div class="nsect rise">${rows.map(resolvedCardHTML).join("")}</div>`;
-  $("#rbody").querySelectorAll(".rcard").forEach(c=>c.onclick=()=>location.hash="#/audit/"+c.dataset.id);
+  $live("#rbody").innerHTML=`<div class="nsect rise">${rows.map(resolvedCardHTML).join("")}</div>`;
+  ($("#rbody")?.querySelectorAll(".rcard")||[]).forEach(c=>c.onclick=()=>location.hash="#/audit/"+c.dataset.id);
   animateIn($("#rbody"));
 }
 function resolvedCardHTML(r){
@@ -1297,12 +1300,13 @@ async function renderDashboard(){
     <div class="lede rise"><h1>Case monitor</h1><p>Closed recall campaigns, re-checked against live evidence. Scope drift is detected from records, never assumed.</p></div>
     <div id="body"></div></div>`;
   animateIn(v);
-  if(!(await conn())){$("#body").innerHTML=`<div class="dist rise in" style="margin-top:44px"><h2>Backend offline</h2><p style="color:var(--ink-2);margin-top:8px">Start the API, then reload.</p></div>`;return;}
+  if(!(await conn())){$live("#body").innerHTML=`<div class="dist rise in" style="margin-top:44px"><h2>Backend offline</h2><p style="color:var(--ink-2);margin-top:8px">Start the API, then reload.</p></div>`;return;}
   const d=await (await fetch(API+"/api/overview")).json();
+  if(!$("#body")) return;   // the user moved to another page while this loaded
   const C=d.counts, confirmed=C.confirmed_trigger_mesh||0, drift=C.chase_record||0, rq=C.remedy_quality_flag||0, watch=(C.monitor||0)+(C.keep_open||0), clear=(C.no_signal||0)+(C.insufficient_evidence||0), tot=d.total||1;
   const active=d.rows.filter(r=>!CLEARED.has(r.decision) && !r.resolved);
   const cleared=d.rows.filter(r=>CLEARED.has(r.decision) && !r.resolved);
-  $("#body").innerHTML=`
+  $live("#body").innerHTML=`
     <div class="metrics">
       <div class="metric lead critical rise"><span class="tag"><em></em>Critical · solving now</span><div class="n">${confirmed}</div><div class="l"><b>confirmed scope expansion</b></div></div>
       <div class="metric rise"><div class="n drift">${drift}</div><div class="l"><b>scope drift</b></div></div>
@@ -1349,7 +1353,12 @@ async function renderDashboard(){
 }
 
 /* ---- case view — runs the agents LIVE and streams every step as it happens ---- */
+let _caseGen=0;
 async function renderCase(id){
+  // Each render gets an id. After every wait it checks it is still the case on screen;
+  // if the user has moved on (another page or another case), it stops quietly.
+  const gen=++_caseGen;
+  const gone=()=>gen!==_caseGen||!document.getElementById("cbody");
   const v=$("#view");
   v.innerHTML=`<div class="page">
     <div class="back" onclick="location.hash=''">${backIcon} All cases</div>
@@ -1365,6 +1374,7 @@ async function renderCase(id){
   const stamp=()=>((performance.now()-t0)/1000).toFixed(1);
   const timerId=setInterval(()=>{ const t=$("#tval"); if(t) t.textContent=stamp()+"s"; },100);
   await conn();
+  if(gone()){ clearInterval(timerId); return; }
 
   let lastPhase=null, seenAny=false, curLines=null;
   const agentState=new Map(), agentOrder=[];
@@ -1485,6 +1495,7 @@ async function renderCase(id){
     }
   }
   function appendEvent(ev){
+    if(gone()) return;
     if(!seenAny){ seenAny=true; $("#loadwrap")?.remove(); }
     touchAgent(ev.actor, ev.text, ev.outcome);
     const feed=$("#feed");
@@ -1524,6 +1535,7 @@ async function renderCase(id){
     });
   }catch(e){
     clearInterval(timerId);
+    if(gone()) return;
     settleAgents("stopped");
     console.error("run_stream failed:", e);   // raw detail stays in the console, not on screen
     const raw=String(e&&e.message||e);
@@ -1539,6 +1551,7 @@ async function renderCase(id){
     return;
   }
   clearInterval(timerId);
+  if(gone()) return;
   settleAgents();
 
   if(d.not_reviewed){
@@ -1579,6 +1592,7 @@ async function renderCase(id){
     let prop=null;
     try{ const nz=((await (await fetch(`${API}/api/notifications`)).json()).notifications)||[];
       prop=nz.find(n=>n.case_id===id && n.type==="resolution_proposal" && n.status==="pending"); }catch(e){}
+    if(gone()) return;
     if(prop){
       html+=`<div class="resolve-card done rise in" id="resolveCard">
         <div class="rc-body"><span class="sentmark">${checkIcon} Proposed — ${prop.action}${prop.owner?` · ${prop.owner}`:''}</span>
