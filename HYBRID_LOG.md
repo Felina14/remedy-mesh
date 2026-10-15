@@ -105,18 +105,23 @@ cross-run memory would weaken the supplier isolation guarantee.
 All changes are in `RemedyMesh-Hybrid/` only and verified unless noted. They were built and tested on the
 service `remedy-mesh-hybrid`, which was then replaced by `remedymesh` (see 3.16).
 
-### 3.14 OEM Counter Agent never counters above its ceiling
-**File:** `layer2.py` (instructions only)
-The "counter softer" clause said *"closer to their price, but still aiming at your ceiling"*,
-which let the agent offer above its own ceiling: once it countered SUP_B at $130 "to leave room
-for negotiation" when SUP_B would have accepted $128, flagging the hero case as over ceiling.
-The clause now says to counter *at* the ceiling when leverage is weak, and states that the counter
-is the price the OEM offers and the ceiling is the most it will pay: never counter above it. If a
-supplier cannot meet the ceiling, its revised offer shows that and the allocation handles it.
-The original app has the old wording.
-**Verified:** 0 of 12 counters above $128 in-process across four leverage situations
-(several / one / no alternatives, offer far above the ceiling), and 0 of 12 on the deployed
-agent after updating it in place.
+### 3.19 Diagrams, merge to `main`, and service cleanup
+- **Two draw.io diagrams with official Google Cloud icons** (from draw.io's own Google Cloud
+  library), each with a PNG export:
+  - `docs/remedy-mesh-agent-engine.drawio` / `.png`: card view, one card per Agent Engine
+    deployment with a Gemini mark, Firestore as the data source, Twilio and Gmail as external
+    services. For slides and the video.
+  - `docs/remedy-mesh-architecture.drawio` / `remedy-mesh-architecture-gcp.png`: detailed view
+    (every Cloud Run component, all 8 agents with their models, IAM, the build and deploy path,
+    the five-step case flow). For the README.
+  - Connections are labelled with what is really used: the Vertex AI SDK (`stream_query`). No A2A
+    or MCP is claimed because neither is used.
+- **`agent-engine` merged into `main`** as a fast-forward (no merge commit). No CI or Cloud Build
+  trigger watches `main`, so nothing redeployed. The original folder's local `main` is
+  deliberately left behind; do not `git pull` there (it has uncommitted edits).
+- **Deleted the Cloud Run service `remedy-mesh-hybrid`**, an older copy of `remedymesh` without
+  the 3.17 and 3.18 fixes. Saves ≈ $0.43/day. Agents, Firestore and the service account are
+  unaffected. Remaining: `remedymesh` (submission) and `remedy-mesh` (original fallback).
 
 ### 3.18 The page never errors when you switch pages mid-load
 **File:** `frontend/index.html`
@@ -159,6 +164,19 @@ The old `remedy-mesh` service is untouched and stays as the fallback.
 The hybrid folder is now a working copy of the private repository on branch **`agent-engine`**
 (based on `main`). Agent resource maps (`agent_engine_lab/deployed*.json`) are git-ignored because
 they contain project-identifying names; the old project ID in the seed script was scrubbed.
+
+### 3.14 OEM Counter Agent never counters above its ceiling
+**File:** `layer2.py` (instructions only)
+The "counter softer" clause said *"closer to their price, but still aiming at your ceiling"*,
+which let the agent offer above its own ceiling: once it countered SUP_B at $130 "to leave room
+for negotiation" when SUP_B would have accepted $128, flagging the hero case as over ceiling.
+The clause now says to counter *at* the ceiling when leverage is weak, and states that the counter
+is the price the OEM offers and the ceiling is the most it will pay: never counter above it. If a
+supplier cannot meet the ceiling, its revised offer shows that and the allocation handles it.
+The original app has the old wording.
+**Verified:** 0 of 12 counters above $128 in-process across four leverage situations
+(several / one / no alternatives, offer far above the ceiling), and 0 of 12 on the deployed
+agent after updating it in place.
 
 ### 3.13 Firestore as the case database (read path)
 **Files:** `agent_engine_lab/update_agents.py`, `remedy_mesh/remote_agents.py`, cloud env.
@@ -327,13 +345,32 @@ Eleanor ran CASE-009 → **Escalate to engineering** → proposal created, no si
 approved the escalation (case resolved), **filed** the Part 573 (real email), **sent** the Ridgeline
 PO (real email with PDF). CASE-001 and CASE-009 moved to Resolved; active 9 → 7; no JS errors.
 
+### 4.5 Demo recording
+Recorded on `remedymesh` (live calls): **CASE-001** in full, then **CASE-009** and **CASE-002**.
+CASE-015 was skipped because its sourcing repeats CASE-001. The analyst works all three cases
+first, then the approver works the whole queue in one pass (one persona switch, and the queue
+shows the handoff).
+
+3-minute script outline (about 420 spoken words):
+
+| Time | Scene | Point made |
+|---|---|---|
+| 0:00–0:25 | Title, NHTSA 24V-104 / 26V422 | The problem: fixes that fail ("fix-the-fix"), buried in complaints |
+| 0:25–0:40 | Architecture diagram | 8 Gemini agents on Agent Engine, data in Firestore, humans approve |
+| 0:40–0:55 | Login, case list | The two personas, nine incoming cases |
+| 0:55–1:35 | CASE-001 Layer 1 | Interpret → investigate → independent verification; policy decides |
+| 1:35–2:15 | CASE-001 negotiation + calls | $128 ceiling, live calls, decline → re-source $150.65 → $131 |
+| 2:15–2:30 | CASE-009, CASE-002 | Escalate to engineering; no signal → dismiss (no false alarm) |
+| 2:30–2:50 | Approver queue | POs sent as real emails, decline acknowledged, Part 573 filed |
+| 2:50–3:00 | Resolved list, consoles | Close |
+
 ---
 
 ## 5. Cost (measured from the project's own usage data)
 
 | Item | While idle | Notes |
 |---|---|---|
-| Cloud Run, 2 services always-on (min 1, 1 vCPU, 1 GiB, request-based billing) | ≈ $0.86 / day | ≈ $0.43 each; nearly the whole bill |
+| Cloud Run, 2 services always-on (`remedymesh`, `remedy-mesh`; min 1, 1 vCPU, 1 GiB, request-based billing) | ≈ $0.86 / day | ≈ $0.43 each; nearly the whole bill |
 | Agent Engine, 8 agents | $0 | billed only while working; a heavy test day used ≈ 2 vCPU-h + 67 GiB-h ≈ $0.78 |
 | Gemini 2.5 Flash + Pro | $0 | heavy test day ≈ $0.65; roughly 3–5¢ per case run |
 | Firestore | ≈ $0 | 603 docs, inside the free tier |
@@ -354,7 +391,7 @@ PO (real email with PDF). CASE-001 and CASE-009 moved to Resolved; active 9 → 
 - Env (values live in the scratch env file, never in the repo): the original variables, plus
   `REMEDY_AGENT_ENGINE=1`, `REMEDY_AGENT_ENGINES=<json map>`, `REMEDY_BACKEND=firestore`.
   `REMEDY_DEMO_CALL` is **not** set.
-- Deploy: `gcloud run deploy remedymesh --source . --region us-central1 --allow-unauthenticated --min-instances 1 --max-instances 1 --cpu 1 --memory 1Gi --service-account <hybrid-sa> --env-vars-file <env.yaml> --quiet`
+- Deploy: `gcloud run deploy remedymesh --source . --region us-central1 --allow-unauthenticated --min-instances 1 --max-instances 1 --cpu 1 --memory 1Gi --timeout 900 --service-account <hybrid-sa> --env-vars-file <env.yaml> --quiet`
 - Reset to pristine: `gcloud run services update remedymesh --region=us-central1 --update-env-vars _RESET=$(date +%s) --quiet`
 - Pristine check: active 9, resolved 0, notifications 0, `data_backend: firestore` at `/api/agent_engines`.
 
