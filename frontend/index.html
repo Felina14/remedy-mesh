@@ -259,7 +259,7 @@
   .fline.thinking{opacity:.75}
   /* a rate-limit retry is a transient system note, not a negotiation step — mute it */
   .fline.sysnote{opacity:.62}
-  .fline.sysnote .fhead b{font-weight:600;color:var(--mut)}
+  .fline.sysnote .fhead b{font-weight:600;color:var(--ink-3)}
   .fline.sysnote .ftext{font-style:italic;font-size:12.5px}
   /* recovery / interrupted-run banner */
   .runnote{margin:14px 0;padding:16px 18px;border-radius:12px;border:1px solid var(--line);background:var(--panel)}
@@ -282,12 +282,12 @@
   .auth-field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px}
   .auth-input{width:100%;padding:12px 14px;font:inherit;font-size:14.5px;color:var(--ink);background:var(--panel-2);
     border:1px solid var(--line-2);border-radius:11px;outline:none;transition:border-color .15s,box-shadow .15s}
-  .auth-input::placeholder{color:var(--mut)}
+  .auth-input::placeholder{color:var(--ink-3)}
   .auth-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%, transparent)}
   .auth-card .btn.primary{width:100%;margin-top:8px;padding:13px;font-size:15px}
   .auth-err{color:var(--rose);font-size:13px;margin-top:12px;min-height:1.1em}
   .auth-demo{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-2);line-height:1.9}
-  .auth-demo .dl{font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:10.5px;color:var(--mut);display:block;margin-bottom:5px}
+  .auth-demo .dl{font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:10.5px;color:var(--ink-3);display:block;margin-bottom:5px}
   .auth-demo code{font-family:var(--mono);font-size:11.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink)}
   @media(max-width:480px){ .auth-card h2{font-size:24px} }
 
@@ -299,7 +299,7 @@
   .mlane{position:relative;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px 13px 14px;transition:border-color .35s,box-shadow .35s}
   .mlane.won{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 28%,transparent),0 12px 28px -16px var(--accent)}
   .mlane-hd{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:650;margin-bottom:10px;line-height:1.2}
-  .mlane-hd small{font-family:var(--mono);font-size:10px;color:var(--mut);font-weight:500;margin-left:auto}
+  .mlane-hd small{font-family:var(--mono);font-size:10px;color:var(--ink-3);font-weight:500;margin-left:auto}
   .mlane .mdot{width:8px;height:8px;border-radius:50%;background:var(--line-2);flex:none}
   .mlane.thinking .mdot{background:var(--accent);animation:apulse 1.1s ease-in-out infinite}
   .mlane.won .mdot{background:var(--accent)}
@@ -309,7 +309,7 @@
   .mstep b{color:var(--ink);font-weight:650;font-family:var(--mono);font-size:13px}
   .mstep .q{color:var(--ink-2);font-size:11px}
   .mstep.counter b{color:var(--accent-ink)}
-  .mstep .rtn{flex-basis:100%;color:var(--mut);font-size:11px;font-style:italic;line-height:1.4;margin-top:1px}
+  .mstep .rtn{flex-basis:100%;color:var(--ink-2);font-size:11px;font-style:italic;line-height:1.4;margin-top:1px}
   .mstep .stance{margin-left:auto;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:5px}
   .mstep .stance.accept{background:var(--ok-wash);color:var(--ok)}
   .mstep .stance.reject{background:var(--rose-wash);color:var(--rose)}
@@ -365,6 +365,16 @@
   .cbub{display:inline-block;padding:11px 16px;border-radius:14px;font-size:14px;line-height:1.5}
   .cbub.agent{background:var(--accent-wash);color:var(--ink);border-bottom-left-radius:4px}
   .cbub.sup{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-bottom-right-radius:4px}
+  /* collapsed call row (replay): a summary + View-transcript button, not the inline transcript */
+  .callsum{display:flex;align-items:center;gap:14px;margin:10px 0;padding:13px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}
+  .callsum.in{opacity:1;transform:none}
+  .callsum .cs-left{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
+  .callsum .cs-left>svg{width:18px;height:18px;color:var(--rose);flex:none}
+  .callsum .cs-title{font-size:13.5px;font-weight:600;color:var(--ink)}
+  .callsum .cs-meta{display:flex;align-items:center;gap:8px;margin-top:3px}
+  .callsum .cs-status{font-size:11px;color:var(--ink-3)}
+  .callsum .cs-view{flex:none}
+  .callsum .cs-view:disabled{opacity:.5;cursor:default}
 
   .verdict{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:28px 30px;box-shadow:var(--shadow);margin-top:30px}
   .verdict.ok{border-color:#bfe8d4;background:linear-gradient(120deg,var(--ok-wash),var(--panel) 62%)}
@@ -420,13 +430,17 @@
   .ncard.po .nspine{background:var(--accent)} .ncard.rejected .nspine{background:var(--rose)}
   .ncard.escalation .nspine{background:var(--amber)} .ncard.sent .nspine{background:var(--ok)}
   .ncard.part573 .nspine{background:var(--rose)}
+  .ncard.reso .nspine{background:var(--accent)}
   .ncard .nicon{width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center}
   .ncard .nicon svg{width:20px;height:20px}
   .ncard.po .nicon{background:var(--accent-wash);color:var(--accent-ink)}
   .ncard.rejected .nicon{background:var(--rose-wash);color:var(--rose)}
   .ncard.escalation .nicon{background:var(--amber-wash);color:var(--amber)}
   .ncard.part573 .nicon{background:var(--rose-wash);color:var(--rose)}
+  .ncard.reso .nicon{background:var(--accent-wash);color:var(--accent-ink)}
   .ncard.sent .nicon{background:var(--ok-wash);color:var(--ok)}
+  .reso-reason{font-size:14px;line-height:1.6;color:var(--ink);background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:4px}
+  .reso-rec{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-weight:600;color:var(--accent-ink)}
   .ncard .ntitle{font-weight:600;letter-spacing:-.01em;font-size:15px}
   .ncard .ndetail{color:var(--ink-2);font-size:13.5px;margin-top:3px}
   .ncard .nmeta{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:12px;margin-top:6px}
@@ -448,7 +462,7 @@
   .drawer.in{transform:none}
   .dhd{display:flex;align-items:center;gap:14px;padding:22px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
   .dhd .dk{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
-  .dhd .dk.po{color:var(--accent-ink)} .dhd .dk.rejected{color:var(--rose)} .dhd .dk.escalation{color:var(--amber)} .dhd .dk.part573{color:var(--rose)} .dhd .dk.sent{color:var(--ok)}
+  .dhd .dk.po{color:var(--accent-ink)} .dhd .dk.rejected{color:var(--rose)} .dhd .dk.escalation{color:var(--amber)} .dhd .dk.part573{color:var(--rose)} .dhd .dk.sent{color:var(--ok)} .dhd .dk.reso{color:var(--accent-ink)}
   .dhd h2{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-top:2px}
   .dclose{margin-left:auto;width:34px;height:34px;flex:none;border:1px solid var(--line);background:var(--panel);border-radius:10px;color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
   .dclose:hover{background:var(--panel-2);color:var(--ink)}
@@ -517,6 +531,7 @@
   .alloc td.callcell{text-align:right}
   .muted-note{color:var(--ink-3);font-size:12.5px}
   .callstatus{display:flex;align-items:center;gap:10px;background:var(--accent-wash);color:var(--accent-ink);border-radius:var(--r-sm);padding:14px 16px;font-size:14px;line-height:1.45}
+  .callstatus .cs-sub{display:block;margin-top:5px;font-weight:600}
   .callstatus svg{width:18px;height:18px;flex:none}
   .callstatus.callwarn{background:var(--rose-wash);color:var(--rose)}
   .confirmed-note{display:inline-flex;align-items:center;gap:6px;color:var(--accent-ink);font-size:12.5px;font-weight:600}
@@ -524,6 +539,40 @@
   .declined-note{color:var(--rose);font-size:12.5px;font-weight:600}
   .backfill-badge{font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:5px;background:var(--accent-wash);color:var(--accent-ink);margin-left:6px}
   .alloc-escalation{margin:14px 22px 2px;padding:12px 16px;background:var(--rose-wash);color:var(--rose);border-radius:10px;font-size:13px;font-weight:500}
+  .reneg-card{margin:4px 22px 16px;padding:13px 16px;border:1px solid color-mix(in srgb,var(--amber) 40%,var(--line));background:var(--amber-wash);border-radius:12px}
+  .reneg-hd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--amber);margin-bottom:6px}
+  .reneg-hd svg{width:16px;height:16px;flex:none}
+  .reneg-body{font-size:13.5px;line-height:1.55;color:var(--ink)}
+  /* the re-negotiation gets its OWN panel, separate from the allocation/call table */
+  .reneg-panel{margin:18px 0;border:1px solid color-mix(in srgb,var(--amber) 32%,var(--line));background:var(--panel);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+  .reneg-phead{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--amber-wash);font-weight:650;font-size:13.5px;letter-spacing:.01em;color:var(--amber);border-bottom:1px solid color-mix(in srgb,var(--amber) 22%,var(--line))}
+  .reneg-phead svg{width:18px;height:18px;flex:none}
+  .reneg-pbody{padding:16px 18px}
+  .reneg-declined{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.5;color:var(--ink);margin-bottom:14px}
+  .reneg-declined b{color:var(--rose)}
+  .reneg-declined .decl-ic{flex:none;width:20px;height:20px;color:var(--rose);display:inline-flex}
+  .reneg-declined .decl-ic svg{width:20px;height:20px}
+  .reneg-pbody .reneg-card{margin:0;background:var(--panel-2);border-color:var(--line)}
+  .reneg-pbody .reneg-hd{color:var(--ink-2)}
+  /* the declined supplier stays visible as a struck row above its backfill */
+  .declined-row td{color:var(--ink-3)}
+  .declined-row s{color:var(--ink-3);text-decoration-color:var(--rose)}
+  .declined-badge{font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:5px;background:var(--rose-wash);color:var(--rose);margin-left:6px}
+  /* persona pill + sign-out menu (theme-aware, name clearly visible) */
+  .whopill-wrap{position:relative}
+  .whopill{display:inline-flex;align-items:center;gap:9px;font:inherit;font-size:13px;color:var(--ink);background:var(--panel-2);border:1px solid var(--line-2);padding:5px 11px 5px 5px;border-radius:999px;cursor:pointer;transition:background .15s,border-color .15s}
+  .whopill:hover{background:var(--panel);border-color:color-mix(in srgb,var(--accent) 45%,var(--line-2))}
+  .whopill .who-av{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none}
+  .whopill .who-nm{color:var(--ink);font-weight:600;white-space:nowrap}
+  .whopill .who-caret{display:inline-flex;color:var(--ink-3)}
+  .whopill .who-caret svg{width:14px;height:14px}
+  .whomenu{position:absolute;top:calc(100% + 8px);right:0;min-width:200px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lift);padding:7px;z-index:300}
+  .whomenu-id{padding:9px 11px 11px;border-bottom:1px solid var(--line);margin-bottom:6px;display:flex;flex-direction:column;gap:2px}
+  .whomenu-id b{font-size:13.5px;color:var(--ink);font-weight:650}
+  .whomenu-id span{font-size:12px;color:var(--ink-3)}
+  .whomenu-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;cursor:pointer;font:inherit;font-size:13.5px;font-weight:500;color:var(--ink);padding:9px 11px;border-radius:8px}
+  .whomenu-item:hover{background:var(--panel-2)}
+  .whomenu-item svg{width:16px;height:16px;color:var(--ink-3);flex:none}
   .sentmark{display:inline-flex;align-items:center;gap:9px;color:var(--ok);font-weight:600;font-size:14.5px}
   .sentmark svg{width:19px;height:19px}
   @media(max-width:620px){ .drawer{width:100vw} .dsum{grid-template-columns:1fr} .pdfframe{height:320px} }
@@ -561,7 +610,9 @@
   <div id="view"></div>
 
 <script>
-const API=(location.hostname==="localhost"||location.hostname==="127.0.0.1")?"http://127.0.0.1:8080":"";
+// The separate :5500 static server talks to the :8080 backend; a page served by a
+// backend itself (Cloud Run, or a local backend on any port) uses its own origin.
+const API=((location.hostname==="localhost"||location.hostname==="127.0.0.1")&&location.port==="5500")?"http://127.0.0.1:8080":"";
 let AUTH=null;
 try{ AUTH=JSON.parse(localStorage.getItem("rm_auth")||"null"); }catch(e){ AUTH=null; }
 function authHeaders(){ return AUTH?{"Authorization":"Bearer "+AUTH.token}:{}; }
@@ -569,12 +620,22 @@ function signOut(){ AUTH=null; try{localStorage.removeItem("rm_auth");}catch(e){
 function renderWho(){
   const w=document.getElementById("whoBox"); if(!w) return;
   if(!AUTH){ w.innerHTML=""; return; }
-  w.innerHTML=`<span style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#c7cad3;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);padding:4px 6px 4px 4px;border-radius:999px">
-    <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none">${AUTH.name[0]}</span>
-    <span>${AUTH.name} · ${AUTH.role}</span>
-    <button id="switchUserBtn" title="Switch user" style="background:none;border:none;color:inherit;cursor:pointer;opacity:.65;font-size:14px;padding:0 2px;line-height:1">&#8646;</button>
-  </span>`;
-  const sb=document.getElementById("switchUserBtn"); if(sb) sb.onclick=signOut;
+  const caret=`<svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const soIcon=`<svg viewBox="0 0 24 24" fill="none"><path d="M15 12H4m0 0l3.5-3.5M4 12l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 4.5h8a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  w.innerHTML=`<div class="whopill-wrap">
+    <button id="whoPill" class="whopill" aria-haspopup="true" aria-expanded="false">
+      <span class="who-av">${AUTH.name[0]}</span>
+      <span class="who-nm">${AUTH.name} · ${AUTH.role}</span>
+      <span class="who-caret">${caret}</span>
+    </button>
+    <div class="whomenu" id="whoMenu" hidden>
+      <div class="whomenu-id"><b>${AUTH.name}</b><span>${AUTH.role}</span></div>
+      <button class="whomenu-item" id="signOutBtn">${soIcon} Sign out</button>
+    </div>
+  </div>`;
+  const pill=document.getElementById("whoPill"), menu=document.getElementById("whoMenu");
+  pill.onclick=(e)=>{ e.stopPropagation(); menu.hidden=!menu.hidden; pill.setAttribute("aria-expanded", String(!menu.hidden)); };
+  document.getElementById("signOutBtn").onclick=signOut;
 }
 function setChrome(){
   // The sign-in screen is a dedicated full-screen auth surface with its own branding —
@@ -657,6 +718,7 @@ const PHASE={
   call:{l:"Supplier Call", c:"p-call", ic:phoneIcon, sub:"Calling only the suppliers that won an allocation, to confirm the price before the deal is final."},
   ledger:{l:"Commitment Ledger", c:"p-ledger", ic:icLock, sub:"Locking in the allocation decided above, ahead of the confirmation calls."},
   resolution:{l:"Resolution · Agent verdict", c:"p-resolution", ic:icScale, sub:"A live agent interprets the deterministic verdict and recommends the next action for this tag."},
+  reneg:{l:"Resolution · Re-sourcing", c:"p-resolution", ic:icScale, sub:"A supplier declined on the call — the agent re-ran sourcing and recommends a reserve supplier to confirm."},
   resolved:{l:"Resolved", c:"p-ledger", ic:icLock, sub:"Closed out by a human operator."},
 };
 const SUPNAME={SUP_A:"Haldane Components",SUP_B:"Correns Manufacturing",SUP_C:"Ridgeline Precision"};
@@ -746,6 +808,7 @@ const NIC={
   escalation:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5 22 20H2L12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4M12 17.3v.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
   part573_draft:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5l7.5 3v5.3c0 4.4-3 8.2-7.5 9.7-4.5-1.5-7.5-5.3-7.5-9.7V5.5L12 2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.6 11.8l2.3 2.3 4.4-4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   sent:`<svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  resolution_proposal:`<svg viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 };
 const sendIcon=`<svg viewBox="0 0 24 24" fill="none"><path d="M4 12l16-7-7 16-2.5-6.5L4 12Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>`;
 const checkIcon=`<svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -778,6 +841,7 @@ async function renderNotifications(){
   const c=d.counts||{};
   $("#nsub").innerHTML=`<span><b>${d.pending||0}</b> awaiting you</span>`+
     `<span><b>${c.pending_po||0}</b> PO drafts</span>`+
+    `<span><b>${c.resolution_proposal||0}</b> resolutions</span>`+
     `<span><b>${c.part573_draft||0}</b> Part 573 amendments</span>`+
     `<span><b>${c.rejected||0}</b> declined</span>`+
     `<span><b>${c.escalation||0}</b> escalations</span>`;
@@ -803,18 +867,22 @@ async function renderNotifications(){
 function cardHTML(n){
   const success=n.status==="sent"||n.status==="filed";
   const terminal=n.status!=="pending";          // sent / filed / declined all leave the queue
-  const typeCls=n.type==="po_draft"?"po":(n.type==="part573_draft"?"part573":n.type);
-  const cls=success?"sent":typeCls;
-  const icon=success?NIC.sent:(NIC[n.type]||NIC.po_draft);
+  const succ2=success||n.status==="approved"||n.status==="acknowledged";
+  const typeCls=n.type==="po_draft"?"po":(n.type==="part573_draft"?"part573":(n.type==="resolution_proposal"?"reso":n.type));
+  const cls=succ2?"sent":typeCls;
+  const icon=succ2?NIC.sent:(NIC[n.type]||NIC.po_draft);
   const ref=n.po_number||n.memo_number||"";
   let cta="";
   if(n.status==="filed") cta=`<span class="sentmark">${checkIcon}Filed</span>`;
   else if(n.status==="sent") cta=`<span class="sentmark">${checkIcon}Sent</span>`;
-  else if(n.status==="declined") cta=`<span class="pill mut"><em></em>${n.type==="part573_draft"?"returned":"declined"}</span>`;
+  else if(n.status==="approved") cta=`<span class="sentmark">${checkIcon}${n.type==="escalation"?"Accepted":"Approved"}</span>`;
+  else if(n.status==="acknowledged") cta=`<span class="sentmark">${checkIcon}Acknowledged</span>`;
+  else if(n.status==="declined") cta=`<span class="pill mut"><em></em>${n.type==="part573_draft"||n.type==="resolution_proposal"||n.type==="escalation"?"returned":"declined"}</span>`;
   else if(n.type==="po_draft") cta=`<span class="ncta">Review &amp; send ${chev}</span>`;
   else if(n.type==="part573_draft") cta=`<span class="ncta">Review &amp; file ${chev}</span>`;
-  else if(n.type==="rejected") cta=`<span class="pill mut"><em></em>re-sourced</span>`;
-  else if(n.type==="escalation") cta=`<span class="pill amber"><em></em>needs decision</span>`;
+  else if(n.type==="resolution_proposal") cta=`<span class="ncta">Review &amp; approve ${chev}</span>`;
+  else if(n.type==="rejected") cta=`<span class="ncta">Review &amp; acknowledge ${chev}</span>`;
+  else if(n.type==="escalation") cta=`<span class="ncta">Review &amp; decide ${chev}</span>`;
   return `<div class="ncard ${cls} ${terminal?'done':''}" data-id="${n.id}">
     <span class="nspine"></span>
     <span class="nicon">${icon}</span>
@@ -946,9 +1014,9 @@ function transcriptHTML(t){
 
 async function openNotif(id){
   const n=await (await fetch(`${API}/api/notifications/${id}`)).json();
-  const kindLabel={po_draft:"Purchase order",part573_draft:"Part 573 amendment",rejected:"Supplier declined",escalation:"Escalation"}[n.type]||"Notification";
-  const done=n.status==="sent"||n.status==="filed";
-  const kcls=done?"sent":(n.type==="part573_draft"?"part573":n.type);
+  const kindLabel={po_draft:"Purchase order",part573_draft:"Part 573 amendment",rejected:"Supplier declined",escalation:"Escalation",resolution_proposal:"Resolution"}[n.type]||"Notification";
+  const done=n.status==="sent"||n.status==="filed"||n.status==="approved"||n.status==="acknowledged";
+  const kcls=done?"sent":(n.type==="part573_draft"?"part573":(n.type==="resolution_proposal"?"reso":n.type));
   let body="";
   if(n.type==="part573_draft"){
     const ed=n.filing_draft||{};
@@ -986,9 +1054,27 @@ async function openNotif(id){
     <div class="efield"><label>Subject</label><input id="emSubject" value="${escAttr(ed.subject||"")}" ${sent?"disabled":""}></div>
     <div class="efield"><label>Message${sent?"":" · editable"}</label><textarea id="emBody" ${sent?"disabled":""}>${escHTML(ed.body||"")}</textarea></div>
     <div class="eattach">${paperclip}<span>Attached: <b>${n.po_number}.pdf</b> — the purchase order</span></div>`;
+  } else if(n.type==="resolution_proposal"){
+    body=`<div class="dsum">
+      <div><div class="k">Recommended action</div><div class="vv" style="font-weight:600">${n.action||""}</div></div>
+      <div><div class="k">Routes to</div><div class="vv">${n.owner||"—"}</div></div>
+      <div><div class="k">Case</div><div class="vv mono">${n.case_id}</div></div>
+      <div><div class="k">Proposed by</div><div class="vv">${n.proposed_by||"Analyst"}</div></div>
+    </div>
+    <div class="dlabel">The agent's reasoning</div>
+    <div class="reso-reason">${n.interpretation||n.recommended_action||"—"}
+      ${n.recommended_action&&n.interpretation?`<div class="reso-rec">${n.recommended_action}</div>`:""}</div>`;
   } else {
     const band=n.type==="rejected"?"rejected":"escalation";
-    body=`<div class="noteband ${band}">${NIC[n.type]}<div>${n.detail||""}</div></div>
+    const rs=n.type==="rejected"&&n.resource;
+    const esc=n.type==="escalation"&&n.need!=null;
+    body=`${esc?`<div class="dsum">
+      <div><div class="k">Units needed</div><div class="vv mono">${(n.need||0).toLocaleString()}</div></div>
+      <div><div class="k">Covered by reserve</div><div class="vv mono">${(n.covered||0).toLocaleString()}</div></div>
+      <div><div class="k">Uncovered</div><div class="vv mono" style="color:var(--rose)">${(n.shortfall||0).toLocaleString()}</div></div>
+      <div><div class="k">Declined supplier</div><div class="vv">${n.broken_name||n.broken_supplier||"—"}</div></div>
+    </div>`:""}<div class="noteband ${band}">${NIC[n.type]}<div>${n.detail||""}</div></div>
+    ${rs?`<div class="dlabel">How the gap was re-sourced</div><div class="reso-reason">${n.resource.reasoning||""}</div>`:""}
     ${transcriptHTML(n.transcript)}`;
   }
   let foot="";
@@ -1011,6 +1097,41 @@ async function openNotif(id){
     foot=`<div class="dfoot"><button class="btn primary" id="approveBtn" ${canApprove?"":"disabled title='Sign in as the Approver to send this'"}>${sendIcon} Approve &amp; send</button>
       <button class="btn" id="declineBtn" ${canApprove?"":"disabled title='Sign in as the Approver to decline this'"} style="margin-left:8px">Decline</button>
       <div class="fnote">${canApprove?"Sends the email above,<br/>with the PO attached.":"Only an Approver can act on this."}</div></div>`;
+  } else if(n.type==="escalation"){
+    if(n.status==="approved"){
+      foot=`<div class="dfoot"><span class="sentmark">${checkIcon}Accepted${n.approved_by?` · ${n.approved_by}`:""}</span>
+        <div class="fnote">Partial cover accepted — the uncovered units stay an open sourcing gap.</div></div>`;
+    } else if(n.status==="declined"){
+      foot=`<div class="dfoot"><span class="sentmark" style="color:var(--rose)">Returned${n.declined_by?` · ${n.declined_by}`:""}</span>
+        <div class="fnote">Sent back to the Analyst to source the rest — the case stays open.</div></div>`;
+    } else {
+      const canDecide=AUTH&&AUTH.role==="Approver";
+      foot=`<div class="dfoot"><button class="btn primary" id="escAcceptBtn" ${canDecide?"":"disabled title='Sign in as the Approver to decide this'"}>${checkIcon} Accept partial cover</button>
+        <button class="btn" id="declineBtn" ${canDecide?"":"disabled title='Sign in as the Approver to return this'"} style="margin-left:8px">Return to Analyst</button>
+        <div class="fnote">${canDecide?"Go ahead with the covered units, or send it<br/>back to source the rest from another supplier.":"Only an Approver can act on this."}</div></div>`;
+    }
+  } else if(n.type==="rejected"){
+    if(n.status==="acknowledged"){
+      foot=`<div class="dfoot"><span class="sentmark">${checkIcon}Acknowledged${n.acknowledged_by?` · ${n.acknowledged_by}`:""}</span>
+        <div class="fnote">The decline and its re-source were reviewed by a human.</div></div>`;
+    } else {
+      const canAck=AUTH&&AUTH.role==="Approver";
+      foot=`<div class="dfoot"><button class="btn primary" id="ackBtn" ${canAck?"":"disabled title='Sign in as the Approver to acknowledge this'"}>${checkIcon} Acknowledge decline</button>
+        <div class="fnote">${canAck?"Confirms you've seen the decline and<br/>how the gap was re-sourced.":"Only an Approver can act on this."}</div></div>`;
+    }
+  } else if(n.type==="resolution_proposal"){
+    if(n.status==="approved"){
+      foot=`<div class="dfoot"><span class="sentmark">${checkIcon}Approved${n.approved_by?` · ${n.approved_by}`:""}</span>
+        <div class="fnote">Case resolved — ${n.action||""}. Logged to the audit trail.</div></div>`;
+    } else if(n.status==="declined"){
+      foot=`<div class="dfoot"><span class="sentmark" style="color:var(--rose)">Returned${n.declined_by?` · ${n.declined_by}`:""}</span>
+        <div class="fnote">Sent back to the Analyst — the case stays open.</div></div>`;
+    } else {
+      const canApprove=AUTH&&AUTH.role==="Approver";
+      foot=`<div class="dfoot"><button class="btn primary" id="resoApproveBtn" ${canApprove?"":"disabled title='Sign in as the Approver to approve this'"}>${checkIcon} Approve &amp; resolve</button>
+        <button class="btn" id="declineBtn" ${canApprove?"":"disabled title='Sign in as the Approver to return this'"} style="margin-left:8px">Return</button>
+        <div class="fnote">${canApprove?"Approve the recommended action,<br/>or return it to the Analyst.":"Only an Approver can act on this."}</div></div>`;
+    }
   } else if(n.status==="declined"){
     foot=`<div class="dfoot"><span class="sentmark" style="color:var(--rose)">Declined${n.declined_by?` · ${n.declined_by}`:""}</span>
       <div class="fnote">Logged to the audit trail.</div></div>`;
@@ -1028,6 +1149,58 @@ async function openNotif(id){
   if(db) db.onclick=()=>declineNotif(id, db);
   const fb=$("#fileBtn");
   if(fb) fb.onclick=()=>fileNotif(id, fb);
+  const rab=$("#resoApproveBtn");
+  if(rab) rab.onclick=()=>approveResolution(id, rab);
+  const kb=$("#ackBtn");
+  if(kb) kb.onclick=()=>ackNotif(id, kb);
+  const eb=$("#escAcceptBtn");
+  if(eb) eb.onclick=()=>acceptEscalation(id, eb);
+}
+
+async function acceptEscalation(id, btn){
+  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:16px;height:16px;border-width:2px"></span> Accepting…`;
+  const db=$("#declineBtn"); if(db) db.disabled=true;
+  try{
+    const resp=await fetch(`${API}/api/notifications/${id}/approve`,{method:"POST",
+      headers:{"Content-Type":"application/json",...authHeaders()},body:"{}"});
+    if(resp.status===401||resp.status===403){ signOut(); return; }
+    const r=await resp.json();
+    if(r.error){ btn.disabled=false; if(db) db.disabled=false; btn.innerHTML=`${checkIcon} Accept partial cover`; alert(r.error); return; }
+    const who=r.notification&&r.notification.approved_by?` · ${r.notification.approved_by}`:"";
+    btn.closest(".dfoot").innerHTML=`<span class="sentmark">${checkIcon}Accepted${who}</span><div class="fnote">Partial cover accepted — the uncovered units stay an open sourcing gap.</div>`;
+    _notifDirty=true; refreshNavBadge();
+  }catch(e){ btn.disabled=false; if(db) db.disabled=false; btn.innerHTML=`${checkIcon} Accept partial cover`; alert("Could not accept: "+e.message); }
+}
+
+async function ackNotif(id, btn){
+  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:16px;height:16px;border-width:2px"></span> Acknowledging…`;
+  try{
+    const resp=await fetch(`${API}/api/notifications/${id}/acknowledge`,{method:"POST",headers:{...authHeaders()}});
+    if(resp.status===401||resp.status===403){ signOut(); return; }
+    const r=await resp.json();
+    if(r.error){ btn.disabled=false; btn.innerHTML=`${checkIcon} Acknowledge decline`; alert(r.error); return; }
+    const who=r.notification&&r.notification.acknowledged_by?` · ${r.notification.acknowledged_by}`:"";
+    btn.closest(".dfoot").innerHTML=`<span class="sentmark">${checkIcon}Acknowledged${who}</span><div class="fnote">The decline and its re-source were reviewed by a human.</div>`;
+    _notifDirty=true; refreshNavBadge();
+  }catch(e){ btn.disabled=false; btn.innerHTML=`${checkIcon} Acknowledge decline`; alert("Could not acknowledge: "+e.message); }
+}
+
+/* Approver signs off on a proposed resolution → the case closes. No email, just approval. */
+async function approveResolution(id, btn){
+  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:16px;height:16px;border-width:2px"></span> Approving…`;
+  const db=$("#declineBtn"); if(db) db.disabled=true;
+  try{
+    const resp=await fetch(`${API}/api/notifications/${id}/approve`,{method:"POST",
+      headers:{"Content-Type":"application/json",...authHeaders()},body:"{}"});
+    if(resp.status===401||resp.status===403){ signOut(); return; }
+    const r=await resp.json();
+    if(r.error){ btn.disabled=false; btn.innerHTML=`${checkIcon} Approve &amp; resolve`; alert(r.error); return; }
+    const foot=btn.closest(".dfoot");
+    const who=r.notification&&r.notification.approved_by?` · ${r.notification.approved_by}`:"";
+    const act=r.notification&&r.notification.action?r.notification.action:"";
+    foot.innerHTML=`<span class="sentmark">${checkIcon}Approved${who}</span><div class="fnote">Case resolved — ${act}. Logged to the audit trail.</div>`;
+    _notifDirty=true; refreshNavBadge();
+  }catch(e){ btn.disabled=false; btn.innerHTML=`${checkIcon} Approve &amp; resolve`; alert("Could not approve: "+e.message); }
 }
 
 async function fileNotif(id, btn){
@@ -1066,11 +1239,12 @@ async function declineNotif(id, btn){
     const resp=await fetch(`${API}/api/notifications/${id}/reject`,{method:"POST",headers:{...authHeaders()}});
     if(resp.status===401||resp.status===403){ signOut(); return; }
     const r=await resp.json();
-    const isMemo=r.notification&&r.notification.type==="part573_draft";
+    const t=r.notification&&r.notification.type;
+    const isReturn=t==="part573_draft"||t==="resolution_proposal"||t==="escalation";
     const who=r.notification&&r.notification.declined_by?` · ${r.notification.declined_by}`:"";
     const foot=btn.closest(".dfoot");
-    foot.innerHTML=`<span class="sentmark" style="color:var(--rose)">${isMemo?"Returned":"Declined"}${who}</span>`+
-      `<div class="fnote">${isMemo?"Sent back to the Analyst for revision — logged to the audit trail.":"Logged to the audit trail."}</div>`;
+    foot.innerHTML=`<span class="sentmark" style="color:var(--rose)">${isReturn?"Returned":"Declined"}${who}</span>`+
+      `<div class="fnote">${t==="escalation"?"Sent back to the Analyst to source the rest — the case stays open.":t==="resolution_proposal"?"Sent back to the Analyst — the case stays open.":(isReturn?"Sent back to the Analyst for revision — logged to the audit trail.":"Logged to the audit trail.")}</div>`;
     _notifDirty=true; refreshNavBadge();
   }catch(e){ btn.disabled=false; if(ab) ab.disabled=false; if(fb) fb.disabled=false; alert("Could not return: "+e.message); }
 }
@@ -1279,19 +1453,36 @@ async function renderCase(id){
     agentState.forEach((a,k)=>{ if(a.outcome==="thinking"){ a.text=label||a.text; a.outcome=""; touched=true; } });
     if(touched) renderAgents();
   }
+  // On replay, a call isn't streamed turn-by-turn into the feed — it's collapsed into one
+  // compact "Confirmation call · <supplier>" row with a View-transcript button; the full
+  // transcript opens in a drawer. (Live, the turns stream in the call drawer, not here.)
+  let callAcc=null;
   function appendCallEvent(ev){
     const feed=$("#feed");
-    const isSupplier=/\(supplier\)/.test(ev.actor);
-    const mode=(ev.meta&&ev.meta.mode)||"simulated";
-    const who=ev.actor.replace(" (supplier)","");
-    const text=ev.text.replace(/^\[[a-z]+\]\s*/i,"");
-    const row=el("div",`crow ${isSupplier?'sup':'agent'}`);
-    row.innerHTML=`<div class="cwrap">
-      <div class="cwho">${phoneIcon}<span>${who}</span><span class="cmode ${mode}">${mode==='twilio'?'live call':'simulated'}</span><span class="mono">+${stamp()}s</span></div>
-      <div class="cbub ${isSupplier?'sup':'agent'}">${text}${ev.outcome?` <span class="foutcome ${outcomeTone(ev.outcome)}">${ev.outcome.replace(/_/g,' ')}</span>`:''}</div>
-    </div>`;
-    (curLines||feed).appendChild(row);
-    requestAnimationFrame(()=>row.classList.add("in"));
+    const sid=(ev.actor||"").match(/SUP_[A-Z]/)?.[0]||"";
+    const outcome=String(ev.outcome||"");
+    const terminal=/confirmed|declined/.test(outcome);
+    if(!callAcc || callAcc.sid!==sid || callAcc.finished){
+      const name=SUPNAME[sid]||sid||"supplier";
+      const mode=(ev.meta&&ev.meta.mode)||"simulated";
+      const row=el("div","callsum");
+      row.innerHTML=`<div class="cs-left">${phoneIcon}<div class="cs-txt"><div class="cs-title">Confirmation call · ${name}</div>
+        <div class="cs-meta"><span class="cmode ${mode}">${mode==='twilio'?'live call':'simulated'}</span><span class="cs-status">in progress…</span></div></div></div>
+        <button class="btn sm cs-view" disabled>View transcript</button>`;
+      (curLines||feed).appendChild(row);
+      requestAnimationFrame(()=>row.classList.add("in"));
+      callAcc={sid, name, turns:[], row, finished:false};
+    }
+    const who=(ev.actor||"").replace(" (supplier)","").replace(/^Agent\s*→\s*/,"");
+    const text=(ev.text||"").replace(/^\[[a-z]+\]\s*/i,"");
+    callAcc.turns.push({actor:who, text, agent:/agent/i.test(ev.actor||"")});
+    if(terminal){
+      callAcc.finished=true;
+      const st=callAcc.row.querySelector(".cs-status");
+      if(st){ st.className="cs-status foutcome "+outcomeTone(outcome); st.textContent=outcome.replace(/_/g,' '); }
+      const btn=callAcc.row.querySelector(".cs-view"), turns=callAcc.turns.slice(), name=callAcc.name;
+      btn.disabled=false; btn.onclick=()=>openTranscriptDrawer(name, turns);
+    }
   }
   function appendEvent(ev){
     if(!seenAny){ seenAny=true; $("#loadwrap")?.remove(); }
@@ -1372,7 +1563,7 @@ async function renderCase(id){
     </div></div>`;
   if(confirmed && d.l2){
     _allocTarget=(d.l2.demand&&d.l2.demand.quantity)||60000;
-    html+=`<div id="allocMount"></div>`;
+    html+=`<div id="renegMount"></div><div id="allocMount"></div>`;
   }
   // Confirmed, but Layer 2 was paused by a transient rate limit. The verdict and the Part 573
   // amendment are preserved; offer a clean retry to finish supplier sourcing — never a raw error.
@@ -1385,14 +1576,24 @@ async function renderCase(id){
   // Non-sourcing tags: the ResolutionAgent proposed an action — offer the in-case resolve button.
   if(!confirmed && d.resolution){
     const R=d.resolution;
-    html+=`<div class="resolve-card rise in" id="resolveCard">
-      <div class="rc-body">
-        <div class="rc-label">Recommended resolution</div>
-        <div class="rc-action">${R.recommended_action}</div>
-        ${R.owner?`<div class="rc-owner"><em></em>Routes to ${R.owner}</div>`:''}
-      </div>
-      <button class="btn primary" id="resolveBtn" ${AUTH&&AUTH.role==="Analyst"?"":"disabled title='Sign in as the Analyst to resolve this'"}>${R.action_label}</button>
-    </div>`;
+    let prop=null;
+    try{ const nz=((await (await fetch(`${API}/api/notifications`)).json()).notifications)||[];
+      prop=nz.find(n=>n.case_id===id && n.type==="resolution_proposal" && n.status==="pending"); }catch(e){}
+    if(prop){
+      html+=`<div class="resolve-card done rise in" id="resolveCard">
+        <div class="rc-body"><span class="sentmark">${checkIcon} Proposed — ${prop.action}${prop.owner?` · ${prop.owner}`:''}</span>
+          <div class="rc-owner" style="color:var(--ink-3)">Awaiting the Approver's sign-off in Notifications. The case stays open until then.</div></div>
+        <a class="btn primary" href="#/notifications" style="text-decoration:none">View in Notifications</a></div>`;
+    } else {
+      html+=`<div class="resolve-card rise in" id="resolveCard">
+        <div class="rc-body">
+          <div class="rc-label">Recommended resolution</div>
+          <div class="rc-action">${R.recommended_action}</div>
+          ${R.owner?`<div class="rc-owner"><em></em>Routes to ${R.owner}</div>`:''}
+        </div>
+        <button class="btn primary" id="resolveBtn" ${AUTH&&AUTH.role==="Analyst"?"":"disabled title='Sign in as the Analyst to propose this'"}>${R.action_label}</button>
+      </div>`;
+    }
   }
   $("#cbody").insertAdjacentHTML("beforeend", html);
   animateIn($("#cbody"));
@@ -1407,18 +1608,56 @@ let _allocTarget=60000;
 /* Re-renders the allocation from the LIVE ledger — so after a decline re-sources to the
    reserve supplier, that backfill appears as a commitment with its own Call button, and
    no PO is drafted until that supplier is confirmed by call (same rule as the primaries). */
+/* Live "agent re-running sourcing" state — shown while the real LLM re-negotiates with a
+   reserve supplier after a decline, before the reserve + its call button are painted. */
+/* The re-negotiation gets its OWN panel (separate from the allocation/call table). This
+   is the live "agent working" state, shown while the real LLM re-sources a reserve. */
+function renderResourcing(id, declinedName){
+  const mount=document.getElementById("renegMount"); if(!mount) return;
+  mount.innerHTML=`<div class="reneg-panel rise in">
+    <div class="reneg-phead">${icScale}<span>Re-negotiation · supplier declined on the call</span>
+      <span class="ring" style="width:15px;height:15px;border-width:2px;margin-left:auto"></span></div>
+    <div class="reneg-pbody">
+      ${declinedName?`<div class="reneg-declined"><span class="decl-ic">${NIC.rejected}</span><div><b>${declinedName} declined</b> the confirmation call — reopening only that commitment.</div></div>`:''}
+      <p class="reneg-body">Re-soliciting a reserve supplier in a live, isolated agent session for a replacement offer that still covers the gap and holds the deadline…</p>
+    </div>
+  </div>`;
+}
+
+/* The finished re-negotiation panel: the decline + the agent's reasoning for the reserve. */
+function renderRenegPanel(backfill){
+  const mount=document.getElementById("renegMount"); if(!mount) return;
+  mount.innerHTML = backfill ? `<div class="reneg-panel rise in">
+    <div class="reneg-phead">${icScale}<span>Re-negotiation · reserve supplier secured</span></div>
+    <div class="reneg-pbody">
+      <div class="reneg-declined"><span class="decl-ic">${NIC.rejected}</span><div><b>${backfill.broken_name} declined</b> the confirmation call — reopening only that commitment.</div></div>
+      <div class="reneg-card">
+        <div class="reneg-hd">${icScale}<span>ResolutionAgent · re-sourced the declined commitment</span></div>
+        <p class="reneg-body">${backfill.reasoning||""}</p>
+      </div>
+    </div>
+  </div>` : "";
+}
+
 async function renderAllocation(id){
   const mount=document.getElementById("allocMount"); if(!mount) return;
   const isAnalyst = AUTH && AUTH.role==="Analyst";
-  let commits=[], doneSup={}, escalation=null;
+  let commits=[], doneSup={}, escalation=null, backfill=null;
   try{
-    commits=((await (await fetch(`${API}/api/commitments/${id}`)).json()).commitments)||[];
+    const cj=await (await fetch(`${API}/api/commitments/${id}`)).json();
+    commits=cj.commitments||[]; backfill=cj.backfill||null;
     const nz=((await (await fetch(`${API}/api/notifications`)).json()).notifications)||[];
     nz.forEach(n=>{ if(n.case_id===id){
       if(n.type==="po_draft" && n.supplier_id) doneSup[n.supplier_id]="confirmed";
       if(n.type==="escalation") escalation=n;
     }});
   }catch(e){}
+  // The re-sourcing reasoning lives in its OWN panel (renderRenegPanel) — not inside this box.
+  const hasBackfillRow = commits.some(c=>c.status==="Re-committed");
+  renderRenegPanel(hasBackfillRow ? backfill : null);
+  // A struck-through row for the supplier that declined, so it doesn't vanish when the reserve
+  // takes its place — the backfill row sits right below it.
+  const declinedRow = (backfill && hasBackfillRow) ? `<tr class="declined-row"><td><s>${backfill.broken_name||backfill.broken_sid}</s> <span class="declined-badge">declined</span></td><td class="num"><s>${(backfill.covered||0).toLocaleString()}</s></td><td class="num">—</td><td>Declined on call</td><td class="callcell"><span class="muted-note">—</span></td></tr>` : "";
   const totalCost=commits.reduce((a,c)=>a+c.quantity*c.unit_price,0);
   const totalUnits=commits.reduce((a,c)=>a+c.quantity,0);
   const short=(_allocTarget||0)-totalUnits;
@@ -1429,7 +1668,7 @@ async function renderAllocation(id){
     <h3>Negotiated allocation — ${short<=0?'demand fully met':short.toLocaleString()+' units short'} · ${money(totalCost)} total</h3>
     <p class="alloc-hint">${isAnalyst?'The agent negotiated these deals and is ready to confirm each by phone. Click <b>Call to confirm</b> to place the real call.':'The Analyst confirms these deals by phone before a PO is drafted.'}</p>
     <table><thead><tr><th>Supplier</th><th>Units</th><th>Unit price</th><th>Status</th><th></th></tr></thead><tbody>
-    ${commits.map(c=>`<tr><td>${c.supplier_id}${c.status==='Re-committed'?` <span class="backfill-badge">backfill</span>`:''}</td><td class="num">${c.quantity.toLocaleString()}</td><td class="num">${money(c.unit_price)}</td><td>${c.status}</td><td class="callcell">${callCell(c)}</td></tr>`).join("")}
+    ${commits.map(c=>(c.status==='Re-committed'?declinedRow:"")+`<tr><td>${c.supplier_id}${c.status==='Re-committed'?` <span class="backfill-badge">backfill</span>`:''}</td><td class="num">${c.quantity.toLocaleString()}</td><td class="num">${money(c.unit_price)}</td><td>${c.status}</td><td class="callcell">${callCell(c)}</td></tr>`).join("")}
     </tbody></table>
     ${escalation?`<div class="alloc-escalation">\u26a0 ${escalation.detail}</div>`:''}
   </div>`;
@@ -1451,14 +1690,24 @@ async function placeCall(caseId, btn){
   openCallDrawer(caseId, cmtId, supId, res, btn, startSeq);
 }
 
+/* Open a stored call's transcript in a drawer (from the collapsed call row on replay). */
+function openTranscriptDrawer(name, turns){
+  const body=`<div class="dlabel">Call transcript</div><div class="tscript">`+(turns||[]).map(x=>{
+    const who=x.agent?'Agent':(SUPNAME[x.actor]||x.actor);
+    return `<div class="tturn ${x.agent?'agent':''}"><span class="tw">${who}</span><span class="tx">${x.text||''}</span></div>`;
+  }).join("")+`</div>`;
+  openDrawer(`<div class="dhd"><div><div class="dk po">Supplier confirmation call</div><h2>${name}</h2></div>
+    <button class="dclose" aria-label="Close">&times;</button></div><div class="dbody">${body}</div>`);
+}
+
 function openCallDrawer(caseId, cmtId, supId, res, btn, startSeq){
-  const live = res.mode==='twilio';
-  openDrawer(`<div class="dhd"><div><div class="dk po">Supplier confirmation call</div><h2>Calling ${supId}</h2></div>
+  const nm = SUPNAME[supId]||supId;
+  openDrawer(`<div class="dhd"><div><div class="dk po">Supplier confirmation call</div><h2>Calling ${nm}</h2></div>
     <button class="dclose" aria-label="Close">&times;</button></div>
     <div class="dbody">
-      <div class="callstatus" id="callStatus">${live?`${phoneIcon} Your phone is ringing — answer and confirm the order in your own words.`:`Simulated call — no Twilio credentials on this machine.`}</div>
+      <div class="callstatus" id="callStatus"><span class="ring" style="width:14px;height:14px;border-width:2px"></span> Live call in progress…</div>
       <div class="dlabel">Live transcript</div>
-      <div class="tscript" id="callScript"><div class="muted-note" style="padding:12px">Waiting for the conversation…</div></div>
+      <div class="tscript" id="callScript"><div class="muted-note" style="padding:12px">Connecting…</div></div>
     </div>`);
   let done=false, ticks=0, lastOutcome="";
   async function poll(){
@@ -1473,17 +1722,41 @@ function openCallDrawer(caseId, cmtId, supId, res, btn, startSeq){
           const tag=(e.outcome&&e.outcome!=='ringing')?` <span class="foutcome ${outcomeTone(e.outcome)}">${String(e.outcome).replace(/_/g,' ')}</span>`:'';
           if(e.outcome && /confirmed/.test(String(e.outcome))){ done=true; lastOutcome="confirmed"; }
           else if(e.outcome && /declined/.test(String(e.outcome))){ done=true; lastOutcome="declined"; }
-          return `<div class="tturn ${agent?'agent':''}"><span class="tw">${agent?'Agent':(e.actor||'').replace(' (supplier)','')}</span><span class="tx">${e.text||''}${tag}</span></div>`;
+          const raw=(e.actor||'').replace(' (supplier)','').replace(/^Agent\s*→\s*/,'');
+          const who=agent?'Agent':(SUPNAME[raw]||raw);
+          return `<div class="tturn ${agent?'agent':''}"><span class="tw">${who}</span><span class="tx">${e.text||''}${tag}</span></div>`;
         }).join("");
       }
       if(done){
         const st=document.getElementById("callStatus");
-        if(st) st.innerHTML = lastOutcome==="declined"
-          ? `${checkIcon} Supplier declined — the agent re-sourced the gap to the reserve supplier. Confirm the backfill in the allocation below (or review the escalation in Notifications).`
-          : `${checkIcon} Call complete — the purchase order has been drafted and sent to the Approver.`;
         refreshNavBadge();
         if(btn){ btn.disabled=true; btn.innerHTML = lastOutcome==="declined" ? `Declined` : `${checkIcon} Confirmed`; btn.classList.add("done"); }
-        renderAllocation(caseId);
+        if(lastOutcome==="declined"){
+          // The supplier declined. The agent GENUINELY re-runs sourcing (a real LLM call that
+          // takes a few seconds) to find a reserve. Return to the window and show it working,
+          // then paint the reserve + its call button once the live re-source lands.
+          if(st) st.innerHTML = `${checkIcon} ${nm} declined — the agent is re-running sourcing to find a reserve supplier…`;
+          renderResourcing(caseId, nm);             // live "agent working" panel, names the decliner
+          setTimeout(()=>{ closeDrawer(); }, 1800);  // come back to the window to watch the re-source
+          (async()=>{
+            for(let w=0; w<45; w++){                 // poll up to ~36s for the real LLM re-source
+              try{ const cj=await (await fetch(`${API}/api/commitments/${caseId}`)).json();
+                if(cj.backfill && (cj.commitments||[]).some(c=>c.status==="Re-committed")){ renderAllocation(caseId); return; }
+              }catch(e){}
+              await new Promise(r=>setTimeout(r,800));
+            }
+            renderAllocation(caseId);                 // fallback render after the wait window
+          })();
+        } else {
+          // Confirmed: wait for the PO draft to land, then show the confirmed row.
+          for(let w=0; w<14; w++){
+            try{ const nz=((await (await fetch(`${API}/api/notifications`)).json()).notifications)||[];
+              if(nz.some(n=>n.case_id===caseId && n.type==="po_draft" && n.supplier_id===supId)) break; }catch(e){}
+            await new Promise(r=>setTimeout(r,500));
+          }
+          if(st) st.innerHTML = `${checkIcon} Confirmed · purchase order drafted.`;
+          renderAllocation(caseId);
+        }
         return;
       }
     }catch(e){}
@@ -1499,18 +1772,26 @@ function openCallDrawer(caseId, cmtId, supId, res, btn, startSeq){
 }
 
 async function resolveCase(id, R, btn){
-  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:16px;height:16px;border-width:2px"></span> Resolving…`;
+  btn.disabled=true; btn.innerHTML=`<span class="ring" style="width:16px;height:16px;border-width:2px"></span> Proposing…`;
   try{
     const resp=await fetch(`${API}/api/resolve/${id}`,{method:"POST",headers:{"Content-Type":"application/json",...authHeaders()},
-      body:JSON.stringify({action:R.action_label, owner:R.owner, decision:R.decision})});
+      body:JSON.stringify({action:R.action_label, owner:R.owner, decision:R.decision,
+        interpretation:R.interpretation, recommended_action:R.recommended_action})});
     if(resp.status===401||resp.status===403){ signOut(); return; }
+    const r=await resp.json();
+    if(r.error){ btn.disabled=false; btn.textContent=R.action_label; alert(r.error); return; }
     const card=$("#resolveCard");
     card.classList.add("done");
-    card.innerHTML=`<div class="rc-body"><span class="sentmark">${checkIcon} Resolved — ${R.action_label}${R.owner?` · ${R.owner}`:''}</span>
-      <div class="rc-owner" style="color:var(--ink-3)">Logged to the audit trail and moved to Resolved.</div></div>
-      <a class="btn primary" href="#/resolved" style="text-decoration:none">View in Resolved</a>`;
-  }catch(e){ btn.disabled=false; btn.textContent=R.action_label; alert("Could not resolve: "+e.message); }
+    card.innerHTML=`<div class="rc-body"><span class="sentmark">${checkIcon} Proposed — ${R.action_label}${R.owner?` · ${R.owner}`:''}</span>
+      <div class="rc-owner" style="color:var(--ink-3)">Sent to the Approver for sign-off. They approve or return it — the case stays open until then.</div></div>
+      <a class="btn primary" href="#/notifications" style="text-decoration:none">View in Notifications</a>`;
+    refreshNavBadge();
+  }catch(e){ btn.disabled=false; btn.textContent=R.action_label; alert("Could not propose: "+e.message); }
 }
+
+// close the persona menu when clicking anywhere outside it
+document.addEventListener("click", e=>{ const m=document.getElementById("whoMenu"); if(m && !m.hidden && !e.target.closest(".whopill-wrap")) m.hidden=true; });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ const m=document.getElementById("whoMenu"); if(m) m.hidden=true; } });
 
 renderWho();
 router();

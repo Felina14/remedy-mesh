@@ -68,8 +68,28 @@ try:
     from google.adk.tools import FunctionTool, ToolContext
 
     # ---- Layer 1 ----
+    def _evaluate_case_scoped(case_id: str, tool_context: ToolContext) -> dict:
+        """Deterministically evaluate whether a closed/remedied case needs reopening.
+
+        Computes the evidence-sufficiency criteria (vin_match, lot_match,
+        scope_drift_shown, install_date_confirmed, duplicate_cleared,
+        threshold_crossed) and returns a decision. Never guesses — pure record math.
+        """
+        # When the agent runs as its own service (Agent Engine), it has its own memory,
+        # so a lot record the orchestrator already obtained would be invisible to it.
+        # The orchestrator is the source of truth and passes its obtained records in the
+        # session state; sync to them first so every agent audits the same records.
+        records = tool_context.state.get("lot_records")
+        if isinstance(records, dict):
+            if case_id in records:
+                logic._CONFIRMED[case_id] = records[case_id]
+            else:
+                logic._CONFIRMED.pop(case_id, None)
+        return logic.evaluate_case(case_id)
+    _evaluate_case_scoped.__name__ = "evaluate_case"   # the name the agents' instructions use
+
     list_cases_tool = FunctionTool(list_cases)
-    evaluate_tool = FunctionTool(evaluate_case)
+    evaluate_tool = FunctionTool(_evaluate_case_scoped)
     obtain_record_tool = FunctionTool(obtain_lot_record)
     policy_tool = FunctionTool(get_policy)
     complaints_tool = FunctionTool(get_case_complaints)

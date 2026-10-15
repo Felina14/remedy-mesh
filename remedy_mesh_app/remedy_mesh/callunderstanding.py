@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 
 from .config import MODEL_FLASH
 from .agent_runner import run_agent_text
@@ -19,7 +20,8 @@ from .agent_runner import run_agent_text
 # once tunnel + Twilio latency was added. So the in-call agent uses FLASH with THINKING
 # DISABLED (≈3s, predictable) and we still cap it at TURN_BUDGET seconds, falling back
 # to a safe keyword read if a turn is ever slow — Twilio always gets a timely reply.
-TURN_BUDGET_SECONDS = 8.0
+# Remote (Agent Engine) turns measured ~3s warm; 10s still sits inside Twilio's ~15s window.
+TURN_BUDGET_SECONDS = 10.0 if os.environ.get("REMEDY_AGENT_ENGINE") == "1" else 8.0
 
 try:
     from google.adk.agents import LlmAgent
@@ -34,18 +36,28 @@ try:
             "and the supplier's latest spoken reply in natural language — which may be partial, "
             "conditional, or a counter, not a one-word yes/no. Interpret it like a human would.\n"
             "Decide:\n"
-            "- outcome: EXACTLY ONE of 'confirmed' (full order), 'partial' (can do some now), "
-            "'conditional' (yes, with conditions/timing), 'counter' (wants different price/terms), "
-            "'declined'. Never any other word.\n"
+            "- outcome: EXACTLY ONE of these, never any other word:\n"
+            "  'confirmed' — a yes to the FULL quantity at the order's price and window "
+            "(e.g. 'yes, we can do all of it at that price'). Do not downgrade a plain yes. If "
+            "they accept the quantity and price but have not yet mentioned the delivery window, "
+            "it is still 'confirmed' — set done=false and use reply_text to confirm the window "
+            "on the record.\n"
+            "  'declined' — they cannot or will not supply on these terms (no capacity, can't hold "
+            "the window, line backlogged, 'not at this time') and commit no units now.\n"
+            "  'partial' — they commit FEWER units than ordered now (the rest later or not at all).\n"
+            "  'counter' — they name a different unit price or terms than the order.\n"
+            "  'conditional' — they say yes to the order but attach an explicit condition or "
+            "requirement that is none of the above.\n"
             "- agreed_quantity: integer units they commit now (0 if declined; never null).\n"
-            "- agreed_price: number unit price they accept (the order price if unchanged; never null).\n"
+            "- agreed_price: number — the unit price THEY NAME if they counter, otherwise the "
+            "order price; never 0 and never null.\n"
             "- reply_text: what YOU say back on the call — brief, natural, acknowledging their "
             "answer, and EITHER closing the call OR asking exactly one clarifying follow-up.\n"
             "- done: true if the call can end now, false if you need one more turn.\n"
             "Return ONLY compact JSON with those five keys and no other text."
         ),
         generate_content_config=types.GenerateContentConfig(
-            temperature=0.2, max_output_tokens=400,
+            temperature=0.0, max_output_tokens=400,
             # Disable Gemini 2.5 Flash "thinking": a phone turn needs speed, not deliberation,
             # and thinking tokens were the main source of the slow, variable latency.
             thinking_config=types.ThinkingConfig(thinking_budget=0),

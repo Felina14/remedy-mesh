@@ -35,3 +35,6 @@ Thumbs.db
 
 # Generator byproducts (keep input/, drop large expected outputs)
 remedy_mesh_synthetic_data/expected_outputs/
+
+# Agent Engine resource map — contains project-identifying resource names; Cloud Run gets it via env
+remedy_mesh_app/agent_engine_lab/deployed*.json

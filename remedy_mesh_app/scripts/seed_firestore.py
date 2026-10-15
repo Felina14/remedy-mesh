@@ -3,7 +3,7 @@
 
 Run ONCE after billing + Firestore are enabled:
 
-    export GOOGLE_CLOUD_PROJECT=<project-id>
+    export GOOGLE_CLOUD_PROJECT=<your-project-id>
     gcloud auth application-default login          # if not already
     python scripts/seed_firestore.py
 

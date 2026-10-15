@@ -1,8 +1,51 @@
 """Step 4 — the gate: run Layer 1, and on a confirmed signal run Layer 2, emitting
 a unified timeline the UI renders. This is the end-to-end demo spine.
 """
-from . import data, logic, layer2, resolution
+import asyncio
+import json
+
+from . import data, logic, layer2, remote_agents, resolution
 from .timeline import Timeline
+
+_L1_KEYS = ("evidence_interpreter", "remedy_investigator", "verification_agent")
+_L1_TURN_SECONDS = 60.0
+
+
+def _parse_json(text: str) -> dict | None:
+    try:
+        t = (text or "").strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        o = json.loads(t)
+        return o if isinstance(o, dict) else None
+    except Exception:
+        return None
+
+
+def _readable(v) -> str:
+    """Render an agent's free-form field as plain text: the Interpreter sometimes
+    returns its summary as a nested object, which must never reach the UI as raw
+    {'key': ...} text."""
+    if isinstance(v, dict):
+        parts = []
+        for k, x in v.items():
+            x = _readable(x)
+            if x:
+                parts.append(f"{str(k).replace('_', ' ').capitalize()}: {x.rstrip('.')}.")
+        return " ".join(parts)
+    if isinstance(v, (list, tuple)):
+        return "; ".join(_readable(x) for x in v if _readable(x))
+    return "" if v is None else str(v).strip()
+
+
+async def _l1_turn(tl, actor: str, key: str, case_id: str, state: dict | None = None) -> str | None:
+    """One Layer-1 agent turn on its deployed Agent Engine service. Returns the agent's
+    raw output, or None if it was slow / failed — the run then carries on on the
+    deterministic path, it never stalls."""
+    tl.add("layer1", actor, "Thinking...", outcome="thinking")
+    try:
+        return await asyncio.wait_for(remote_agents.run(key, case_id, state),
+                                      timeout=_L1_TURN_SECONDS)
+    except Exception:
+        return None
 
 
 async def run_pipeline(case_id: str, use_llm: bool = False, confirm: bool = True, on_event=None) -> dict:
@@ -12,9 +55,22 @@ async def run_pipeline(case_id: str, use_llm: bool = False, confirm: bool = True
     tl = Timeline(case_id, on_event=on_event)
 
     # ---- Layer 1 ----
+    # With the agents deployed on Agent Engine, the three Layer-1 agents run for real,
+    # chained the way the RemedyWatchdog SequentialAgent chains them: the Interpreter's
+    # claims feed the Investigator, whose investigation feeds the independent Verifier.
+    # The VERDICT still comes from the deterministic evaluate_case; the agents structure,
+    # investigate and audit it, and a disagreement is surfaced, never silently resolved.
     n = len(data.complaints_for(case_id))
-    tl.add("layer1", "EvidenceInterpreter", f"Structured {n} raw complaints for {case_id}.",
-           meta={"raw_complaints": n})
+    l1_live = use_llm and all(remote_agents.available(k) for k in _L1_KEYS)
+    claims = await _l1_turn(tl, "EvidenceInterpreter", "evidence_interpreter", case_id) if l1_live else None
+    c = _parse_json(claims) if claims else None
+    if c:
+        tl.add("layer1", "EvidenceInterpreter",
+               _readable(c.get("summary")) or f"Structured {n} raw complaints for {case_id}.",
+               meta={"raw_complaints": n, "agent_output": c, "served_by": "agent_engine"})
+    else:
+        tl.add("layer1", "EvidenceInterpreter", f"Structured {n} raw complaints for {case_id}.",
+               meta={"raw_complaints": n})
     r = logic.evaluate_case(case_id)
     m, crit = r["metrics"], r["criteria"]
     tl.add("layer1", "DeterministicMatch",
@@ -22,7 +78,8 @@ async def run_pipeline(case_id: str, use_llm: bool = False, confirm: bool = True
            f"ratio={m['post_pre_rate_ratio']} cluster={m['cluster_crossed']} scope_drift={crit['scope_drift_shown']}",
            outcome=r["decision"], meta={"criteria": crit, "metrics": m})
 
-    if r["decision"] == "chase_record":
+    chased = r["decision"] == "chase_record"
+    if chased:
         rec = logic.obtain_lot_record(case_id)
         tl.add("layer1", "ResolutionLoop",
                f"Chased the missing lot record via {rec.get('obtained_from', 'contact chain')}.",
@@ -30,14 +87,48 @@ async def run_pipeline(case_id: str, use_llm: bool = False, confirm: bool = True
         r = logic.evaluate_case(case_id)        # re-evaluate with the obtained record
         m, crit = r["metrics"], r["criteria"]
 
+    if c:
+        # The orchestrator's obtained lot records travel with the request, so the
+        # separately-deployed Investigator and Verifier audit exactly the records the
+        # app holds (each Agent Engine service has its own memory otherwise).
+        lot_records = {case_id: logic._CONFIRMED[case_id]} if case_id in logic._CONFIRMED else {}
+        inv_raw = await _l1_turn(tl, "RemedyInvestigator", "remedy_investigator", case_id,
+                                 {"claims": claims, "lot_records": lot_records})
+        inv = _parse_json(inv_raw) if inv_raw else None
+        if inv:
+            # Wording follows what the pipeline actually did (chase or not), never the
+            # agent's free-form field — a record already on file is not a "chase".
+            how = " after chasing the missing lot record" if chased else ""
+            tl.add("layer1", "RemedyInvestigator",
+                   f"Ran the deterministic evaluation{how} — reports "
+                   f"{str(inv.get('decision', '?')).replace('_', ' ')}.",
+                   outcome=inv.get("decision"), meta={"agent_output": inv, "served_by": "agent_engine"})
+            ver_raw = await _l1_turn(tl, "VerificationAgent", "verification_agent", case_id,
+                                     {"investigation": inv_raw, "lot_records": lot_records})
+            ver = _parse_json(ver_raw) if ver_raw else None
+            if ver:
+                missing = ", ".join(ver.get("missing_criteria") or []) or "none"
+                agrees = ver.get("decision") == r["decision"]
+                text = (f"Independent audit against policy: "
+                        f"{'confirmed' if ver.get('confirmed') else 'not confirmed'} "
+                        f"({str(ver.get('decision', '?')).replace('_', ' ')}). Missing criteria: {missing}.")
+                if not agrees:
+                    text += (" The audit disagrees with the deterministic verdict — the deterministic "
+                             "verdict stands and the case is flagged for human review.")
+                tl.add("layer1", "VerificationAgent", text,
+                       outcome=r["decision"] if agrees else "audit_disagrees",
+                       meta={"agent_output": ver, "served_by": "agent_engine",
+                             "agrees_with_deterministic": agrees, "criteria": crit, "metrics": m})
+
     confirmed = r["decision"] == "confirmed_trigger_mesh"
 
     if confirmed:
         # Real agent narration here too — explains WHICH criterion actually triggered
         # (rate-ratio spike vs geographic cluster vs both), so a low ratio sitting next
         # to a confirmed verdict is explained, not just displayed as raw numbers.
+        # Labelled as the agent that actually wrote it (the Resolution Agent).
         ver = await resolution.resolve_case(r)
-        tl.add("layer1", "VerificationAgent", ver["interpretation"],
+        tl.add("layer1", "ResolutionAgent", ver["interpretation"],
                outcome=r["decision"], meta={"criteria": crit, "metrics": m, "source": ver["source"]})
         # ---- Gate → Layer 2 ----
         tl.add("gate", "RemedyWatchdog", "Scope expansion CONFIRMED — triggering the negotiation mesh.",

@@ -1,0 +1,704 @@
+[
+  {
+    "dealer_id": "DLR-001",
+    "name": "Maple Ridge Isar TN",
+    "city": "TN",
+    "state": "TN",
+    "lat": 35.0498,
+    "lon": -86.1466,
+    "phone": "+1-555-645-6606",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TN",
+      "phone": "+1-555-757-4869"
+    }
+  },
+  {
+    "dealer_id": "DLR-002",
+    "name": "Bayline Isar FL",
+    "city": "FL",
+    "state": "FL",
+    "lat": 28.1603,
+    "lon": -82.8719,
+    "phone": "+1-555-698-2873",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA FL",
+      "phone": "+1-555-806-8584"
+    }
+  },
+  {
+    "dealer_id": "DLR-003",
+    "name": "Larkspur Isar TN",
+    "city": "TN",
+    "state": "TN",
+    "lat": 35.8822,
+    "lon": -85.7883,
+    "phone": "+1-555-515-7648",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TN",
+      "phone": "+1-555-271-2781"
+    }
+  },
+  {
+    "dealer_id": "DLR-004",
+    "name": "Maple Ridge Isar AZ",
+    "city": "AZ",
+    "state": "AZ",
+    "lat": 34.4838,
+    "lon": -110.6702,
+    "phone": "+1-555-535-9098",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA AZ",
+      "phone": "+1-555-860-2007"
+    }
+  },
+  {
+    "dealer_id": "DLR-005",
+    "name": "Bayline Isar IN",
+    "city": "IN",
+    "state": "IN",
+    "lat": 39.1723,
+    "lon": -87.271,
+    "phone": "+1-555-973-1003",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA IN",
+      "phone": "+1-555-975-3403"
+    }
+  },
+  {
+    "dealer_id": "DLR-006",
+    "name": "Maple Ridge Isar AZ",
+    "city": "AZ",
+    "state": "AZ",
+    "lat": 32.8881,
+    "lon": -111.3425,
+    "phone": "+1-555-830-8326",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA AZ",
+      "phone": "+1-555-400-4369"
+    }
+  },
+  {
+    "dealer_id": "DLR-007",
+    "name": "Maple Ridge Isar NC",
+    "city": "NC",
+    "state": "NC",
+    "lat": 36.3364,
+    "lon": -79.3072,
+    "phone": "+1-555-935-6640",
+    "serviced_lots": [
+      "LOT-4471"
+    ],
+    "regional_quality_contact": {
+      "name": "Regional QA NC",
+      "phone": "+1-555-291-1133"
+    }
+  },
+  {
+    "dealer_id": "DLR-008",
+    "name": "Larkspur Isar GA",
+    "city": "GA",
+    "state": "GA",
+    "lat": 34.2074,
+    "lon": -83.9082,
+    "phone": "+1-555-501-2022",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA GA",
+      "phone": "+1-555-578-9992"
+    }
+  },
+  {
+    "dealer_id": "DLR-009",
+    "name": "Crestview Isar NC",
+    "city": "NC",
+    "state": "NC",
+    "lat": 34.432,
+    "lon": -79.6419,
+    "phone": "+1-555-312-5623",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA NC",
+      "phone": "+1-555-231-4854"
+    }
+  },
+  {
+    "dealer_id": "DLR-010",
+    "name": "Crestview Isar TX",
+    "city": "TX",
+    "state": "TX",
+    "lat": 31.5353,
+    "lon": -97.856,
+    "phone": "+1-555-928-7271",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TX",
+      "phone": "+1-555-615-7251"
+    }
+  },
+  {
+    "dealer_id": "DLR-011",
+    "name": "Maple Ridge Isar TX",
+    "city": "TX",
+    "state": "TX",
+    "lat": 31.1583,
+    "lon": -97.105,
+    "phone": "+1-555-342-4083",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TX",
+      "phone": "+1-555-768-7301"
+    }
+  },
+  {
+    "dealer_id": "DLR-012",
+    "name": "Larkspur Isar TN",
+    "city": "TN",
+    "state": "TN",
+    "lat": 36.5659,
+    "lon": -87.6581,
+    "phone": "+1-555-337-1190",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TN",
+      "phone": "+1-555-273-1257"
+    }
+  },
+  {
+    "dealer_id": "DLR-013",
+    "name": "Maple Ridge Isar FL",
+    "city": "FL",
+    "state": "FL",
+    "lat": 28.3012,
+    "lon": -81.7272,
+    "phone": "+1-555-339-2387",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA FL",
+      "phone": "+1-555-340-7813"
+    }
+  },
+  {
+    "dealer_id": "DLR-014",
+    "name": "Maple Ridge Isar CA",
+    "city": "CA",
+    "state": "CA",
+    "lat": 37.0646,
+    "lon": -119.1329,
+    "phone": "+1-555-838-3945",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA CA",
+      "phone": "+1-555-665-9346"
+    }
+  },
+  {
+    "dealer_id": "DLR-015",
+    "name": "Crestview Isar TX",
+    "city": "TX",
+    "state": "TX",
+    "lat": 31.1749,
+    "lon": -97.6999,
+    "phone": "+1-555-431-4044",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TX",
+      "phone": "+1-555-634-1121"
+    }
+  },
+  {
+    "dealer_id": "DLR-016",
+    "name": "Bayline Isar GA",
+    "city": "GA",
+    "state": "GA",
+    "lat": 33.0356,
+    "lon": -82.9934,
+    "phone": "+1-555-475-7731",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA GA",
+      "phone": "+1-555-759-7012"
+    }
+  },
+  {
+    "dealer_id": "DLR-017",
+    "name": "Crestview Isar NC",
+    "city": "NC",
+    "state": "NC",
+    "lat": 36.7778,
+    "lon": -79.6192,
+    "phone": "+1-555-315-8889",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA NC",
+      "phone": "+1-555-907-2311"
+    }
+  },
+  {
+    "dealer_id": "DLR-018",
+    "name": "Crestview Isar FL",
+    "city": "FL",
+    "state": "FL",
+    "lat": 28.3224,
+    "lon": -81.6161,
+    "phone": "+1-555-676-9469",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA FL",
+      "phone": "+1-555-280-9574"
+    }
+  },
+  {
+    "dealer_id": "DLR-019",
+    "name": "Hennessy Isar GA",
+    "city": "GA",
+    "state": "GA",
+    "lat": 32.0523,
+    "lon": -83.7171,
+    "phone": "+1-555-900-9834",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA GA",
+      "phone": "+1-555-793-6119"
+    }
+  },
+  {
+    "dealer_id": "DLR-020",
+    "name": "Hennessy Isar GA",
+    "city": "GA",
+    "state": "GA",
+    "lat": 31.9667,
+    "lon": -84.0781,
+    "phone": "+1-555-680-8438",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA GA",
+      "phone": "+1-555-724-8687"
+    }
+  },
+  {
+    "dealer_id": "DLR-021",
+    "name": "Crestview Isar GA",
+    "city": "GA",
+    "state": "GA",
+    "lat": 33.6012,
+    "lon": -83.8612,
+    "phone": "+1-555-496-3744",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA GA",
+      "phone": "+1-555-236-5981"
+    }
+  },
+  {
+    "dealer_id": "DLR-022",
+    "name": "Maple Ridge Isar WA",
+    "city": "WA",
+    "state": "WA",
+    "lat": 48.0841,
+    "lon": -122.1608,
+    "phone": "+1-555-792-3770",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA WA",
+      "phone": "+1-555-786-1845"
+    }
+  },
+  {
+    "dealer_id": "DLR-023",
+    "name": "Bayline Isar AZ",
+    "city": "AZ",
+    "state": "AZ",
+    "lat": 34.9069,
+    "lon": -110.5651,
+    "phone": "+1-555-227-5699",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA AZ",
+      "phone": "+1-555-696-2351"
+    }
+  },
+  {
+    "dealer_id": "DLR-024",
+    "name": "Crestview Isar FL",
+    "city": "FL",
+    "state": "FL",
+    "lat": 27.7834,
+    "lon": -80.706,
+    "phone": "+1-555-458-3171",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA FL",
+      "phone": "+1-555-830-5603"
+    }
+  },
+  {
+    "dealer_id": "DLR-025",
+    "name": "Hennessy Isar NM",
+    "city": "NM",
+    "state": "NM",
+    "lat": 35.6989,
+    "lon": -107.6102,
+    "phone": "+1-555-818-3860",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA NM",
+      "phone": "+1-555-805-3476"
+    }
+  },
+  {
+    "dealer_id": "DLR-026",
+    "name": "Crestview Isar AZ",
+    "city": "AZ",
+    "state": "AZ",
+    "lat": 33.602,
+    "lon": -110.568,
+    "phone": "+1-555-917-4869",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA AZ",
+      "phone": "+1-555-696-3962"
+    }
+  },
+  {
+    "dealer_id": "DLR-027",
+    "name": "Hennessy Isar OH",
+    "city": "OH",
+    "state": "OH",
+    "lat": 41.2588,
+    "lon": -83.2,
+    "phone": "+1-555-348-3525",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA OH",
+      "phone": "+1-555-707-7765"
+    }
+  },
+  {
+    "dealer_id": "DLR-028",
+    "name": "Larkspur Isar TX",
+    "city": "TX",
+    "state": "TX",
+    "lat": 30.4211,
+    "lon": -97.7275,
+    "phone": "+1-555-415-6653",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TX",
+      "phone": "+1-555-255-5331"
+    }
+  },
+  {
+    "dealer_id": "DLR-029",
+    "name": "Maple Ridge Isar IN",
+    "city": "IN",
+    "state": "IN",
+    "lat": 38.7761,
+    "lon": -86.3608,
+    "phone": "+1-555-508-8803",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA IN",
+      "phone": "+1-555-964-9724"
+    }
+  },
+  {
+    "dealer_id": "DLR-030",
+    "name": "Maple Ridge Isar CO",
+    "city": "CO",
+    "state": "CO",
+    "lat": 38.7715,
+    "lon": -104.7343,
+    "phone": "+1-555-468-3378",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA CO",
+      "phone": "+1-555-743-8122"
+    }
+  },
+  {
+    "dealer_id": "DLR-031",
+    "name": "Maple Ridge Isar NC",
+    "city": "NC",
+    "state": "NC",
+    "lat": 35.1231,
+    "lon": -78.9775,
+    "phone": "+1-555-894-6172",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA NC",
+      "phone": "+1-555-742-1672"
+    }
+  },
+  {
+    "dealer_id": "DLR-032",
+    "name": "Maple Ridge Isar IN",
+    "city": "IN",
+    "state": "IN",
+    "lat": 40.8525,
+    "lon": -85.8752,
+    "phone": "+1-555-825-5466",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA IN",
+      "phone": "+1-555-543-5429"
+    }
+  },
+  {
+    "dealer_id": "DLR-033",
+    "name": "Bayline Isar NM",
+    "city": "NM",
+    "state": "NM",
+    "lat": 35.5656,
+    "lon": -106.935,
+    "phone": "+1-555-600-8554",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA NM",
+      "phone": "+1-555-991-4961"
+    }
+  },
+  {
+    "dealer_id": "DLR-034",
+    "name": "Bayline Isar WA",
+    "city": "WA",
+    "state": "WA",
+    "lat": 47.8125,
+    "lon": -120.7326,
+    "phone": "+1-555-545-3947",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA WA",
+      "phone": "+1-555-520-9972"
+    }
+  },
+  {
+    "dealer_id": "DLR-035",
+    "name": "Hennessy Isar NC",
+    "city": "NC",
+    "state": "NC",
+    "lat": 36.0447,
+    "lon": -78.8813,
+    "phone": "+1-555-621-2600",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA NC",
+      "phone": "+1-555-737-2702"
+    }
+  },
+  {
+    "dealer_id": "DLR-036",
+    "name": "Crestview Isar AZ",
+    "city": "AZ",
+    "state": "AZ",
+    "lat": 33.6003,
+    "lon": -112.2156,
+    "phone": "+1-555-457-4163",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA AZ",
+      "phone": "+1-555-234-1388"
+    }
+  },
+  {
+    "dealer_id": "DLR-037",
+    "name": "Larkspur Isar GA",
+    "city": "GA",
+    "state": "GA",
+    "lat": 32.0607,
+    "lon": -82.4122,
+    "phone": "+1-555-813-2995",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA GA",
+      "phone": "+1-555-925-2965"
+    }
+  },
+  {
+    "dealer_id": "DLR-038",
+    "name": "Bayline Isar IN",
+    "city": "IN",
+    "state": "IN",
+    "lat": 40.7055,
+    "lon": -87.2963,
+    "phone": "+1-555-389-2816",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA IN",
+      "phone": "+1-555-912-4018"
+    }
+  },
+  {
+    "dealer_id": "DLR-039",
+    "name": "Hennessy Isar NM",
+    "city": "NM",
+    "state": "NM",
+    "lat": 34.347,
+    "lon": -105.8007,
+    "phone": "+1-555-854-8429",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA NM",
+      "phone": "+1-555-483-7995"
+    }
+  },
+  {
+    "dealer_id": "DLR-040",
+    "name": "Crestview Isar WA",
+    "city": "WA",
+    "state": "WA",
+    "lat": 48.3681,
+    "lon": -120.7343,
+    "phone": "+1-555-463-3653",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA WA",
+      "phone": "+1-555-999-2212"
+    }
+  },
+  {
+    "dealer_id": "DLR-041",
+    "name": "Crestview Isar NM",
+    "city": "NM",
+    "state": "NM",
+    "lat": 35.5051,
+    "lon": -106.5782,
+    "phone": "+1-555-261-5230",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA NM",
+      "phone": "+1-555-471-3915"
+    }
+  },
+  {
+    "dealer_id": "DLR-042",
+    "name": "Larkspur Isar CA",
+    "city": "CA",
+    "state": "CA",
+    "lat": 35.0866,
+    "lon": -118.3376,
+    "phone": "+1-555-824-7432",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA CA",
+      "phone": "+1-555-382-9061"
+    }
+  },
+  {
+    "dealer_id": "DLR-043",
+    "name": "Larkspur Isar IN",
+    "city": "IN",
+    "state": "IN",
+    "lat": 38.9953,
+    "lon": -85.5076,
+    "phone": "+1-555-828-2740",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA IN",
+      "phone": "+1-555-652-5243"
+    }
+  },
+  {
+    "dealer_id": "DLR-044",
+    "name": "Crestview Isar IN",
+    "city": "IN",
+    "state": "IN",
+    "lat": 38.7337,
+    "lon": -87.4628,
+    "phone": "+1-555-995-8305",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA IN",
+      "phone": "+1-555-219-9154"
+    }
+  },
+  {
+    "dealer_id": "DLR-045",
+    "name": "Hennessy Isar FL",
+    "city": "FL",
+    "state": "FL",
+    "lat": 28.1369,
+    "lon": -83.0876,
+    "phone": "+1-555-880-7397",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA FL",
+      "phone": "+1-555-472-3483"
+    }
+  },
+  {
+    "dealer_id": "DLR-046",
+    "name": "Hennessy Isar WA",
+    "city": "WA",
+    "state": "WA",
+    "lat": 46.9916,
+    "lon": -121.7943,
+    "phone": "+1-555-727-9039",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA WA",
+      "phone": "+1-555-689-8144"
+    }
+  },
+  {
+    "dealer_id": "DLR-047",
+    "name": "Hennessy Isar TX",
+    "city": "TX",
+    "state": "TX",
+    "lat": 31.8757,
+    "lon": -96.7734,
+    "phone": "+1-555-753-4700",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TX",
+      "phone": "+1-555-203-7298"
+    }
+  },
+  {
+    "dealer_id": "DLR-048",
+    "name": "Bayline Isar WA",
+    "city": "WA",
+    "state": "WA",
+    "lat": 48.1631,
+    "lon": -121.5402,
+    "phone": "+1-555-748-6880",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA WA",
+      "phone": "+1-555-541-5961"
+    }
+  },
+  {
+    "dealer_id": "DLR-049",
+    "name": "Hennessy Isar TX",
+    "city": "TX",
+    "state": "TX",
+    "lat": 29.9825,
+    "lon": -96.1684,
+    "phone": "+1-555-574-9759",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA TX",
+      "phone": "+1-555-548-2318"
+    }
+  },
+  {
+    "dealer_id": "DLR-050",
+    "name": "Larkspur Isar CA",
+    "city": "CA",
+    "state": "CA",
+    "lat": 36.7451,
+    "lon": -120.2681,
+    "phone": "+1-555-380-1644",
+    "serviced_lots": [],
+    "regional_quality_contact": {
+      "name": "Regional QA CA",
+      "phone": "+1-555-593-4129"
+    }
+  }
+]

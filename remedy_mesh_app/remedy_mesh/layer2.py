@@ -18,7 +18,7 @@ import os
 import random
 
 from .config import MODEL_FLASH, MODEL_PRO
-from . import data, negotiation as neg, tools, voice
+from . import data, negotiation as neg, remote_agents, tools, voice
 
 # We're staying on the free/trial Vertex quota on purpose -- no billing upgrade.
 # That quota is small and SHARED across Flash and Pro alike, and it's a
@@ -121,16 +121,78 @@ try:
             "deadline, and how many ALTERNATIVE suppliers you have (a COUNT only — you never see "
             "another supplier's offer). Decide the counter price to send THIS supplier. "
             "Reason about leverage: counter HARDER (at or below your ceiling) when the offer is well "
-            "above your ceiling and you have several alternatives; counter SOFTER (closer to their "
-            "price, but still aiming at your ceiling) when you have few/no alternatives or the deadline "
-            "is tight. Never counter above their offered price. "
+            "above your ceiling and you have several alternatives; counter SOFTER (at your ceiling) "
+            "when you have few/no alternatives or the deadline is tight. Your counter is the price you "
+            "OFFER, and your ceiling is the most you will pay: NEVER counter above your ceiling — if "
+            "the supplier cannot meet it, its revised offer will say so and the allocation handles "
+            "it. Never counter above their offered price either. "
             "Return ONLY compact JSON: {\"supplier_id\": str, \"counter_price\": float, \"rationale\": str}."
         ),
         output_key="counter",
     )
+
+    # When a confirmed supplier DECLINES on the call, the gap is re-sourced
+    # deterministically (break_commitment_and_resolve). This agent does NOT pick the
+    # reserve — it reads the already-decided backfill and writes the human-facing
+    # reasoning, in the first person, the way the Layer-1 ResolutionAgent narrates a
+    # verdict. Same split: deterministic core, LLM narrates, safe fallback below.
+    resource_agent = LlmAgent(
+        name="ResolutionAgent",
+        model=MODEL_FLASH,
+        generate_content_config=_FAST_CFG,
+        instruction=(
+            "You are the OEM's sourcing resolution agent. A supplier that had committed just "
+            "DECLINED the order on a confirmation call, and the system has ALREADY re-sourced the "
+            "gap to a reserve supplier (chosen deterministically — you must NOT change or dispute "
+            "the choice). You are given JSON facts. Write 1-2 short sentences, first person, telling "
+            "the human operator WHY this reserve is the right backup: name the declined supplier and "
+            "the reserve, cite the exact units it covers and the delivery deadline it holds, and if "
+            "its price is above the ceiling, frame the premium as the cost of holding the window. End "
+            "by recommending they confirm the reserve by phone. Ground every figure in the facts "
+            "given — invent nothing. No preamble, no bullet points, no JSON — just the sentences."
+        ),
+    )
 except ImportError:
     supplier_offer_agent = None
     oem_counter_agent = None
+    resource_agent = None
+
+
+def _fallback_resource_text(ctx: dict) -> str:
+    """Deterministic re-sourcing narration — always correct, used if the LLM is
+    unavailable or rate-limited. Grounded entirely in the computed backfill."""
+    broken = ctx.get("broken_name", "The supplier")
+    reserve = ctx.get("reserve_name", "the reserve supplier")
+    covered = int(ctx.get("covered", 0))
+    price = float(ctx.get("price", 0) or 0)
+    ceiling = float(ctx.get("ceiling", 0) or 0)
+    wk = int(ctx.get("deadline_weeks", 0) or 0)
+    if price > ceiling > 0:
+        terms = (f" at ${price:,.2f}/unit — a modest premium over the ${ceiling:,.0f} ceiling, "
+                 f"but it holds the {wk}-week delivery window")
+    else:
+        terms = f" at ${price:,.2f}/unit, within the ${ceiling:,.0f} ceiling and the {wk}-week window"
+    return (f"{broken} declined on the call, so I re-ran sourcing against the reserve pool. "
+            f"{reserve} is the one uncommitted supplier with the capacity to absorb the full "
+            f"{covered:,} units{terms}. Recommend confirming {reserve} by phone.")
+
+
+async def narrate_resource(ctx: dict, use_llm: bool = True) -> str:
+    """Agent narration for a re-source, with a deterministic fallback. Reliable for
+    a live demo: a model timeout or rate-limit falls straight through to the
+    computed text, so the reasoning always shows."""
+    if use_llm and resource_agent is not None:
+        try:
+            from .agent_runner import run_agent_text
+            txt = await asyncio.wait_for(
+                run_agent_text(resource_agent, f"Facts: {json.dumps(ctx)}"),
+                timeout=20.0 if remote_agents.ENABLED else 8.0)
+            txt = (txt or "").strip()
+            if len(txt) > 20:
+                return txt
+        except Exception:
+            pass
+    return _fallback_resource_text(ctx)
 
 
 # ------------------------------------------------------------- offer parsing
@@ -157,24 +219,14 @@ async def solicit_offer_llm(supplier_id: str, demand: dict, counter_price: float
     If counter_price is given, this is a counter-round: the agent is told the OEM's
     counter and revises toward (never below) its own cost.
     """
-    from google.adk.runners import Runner
-    from google.adk.sessions import InMemorySessionService
-    from google.genai import types
+    from .agent_runner import run_agent_text
 
-    svc = InMemorySessionService()
-    runner = Runner(agent=supplier_offer_agent, app_name="commitmesh", session_service=svc)
-    # the scoped state is the entire isolation boundary: only THIS supplier + public demand
-    session = await svc.create_session(
-        app_name="commitmesh", user_id="orchestrator",
-        state={"supplier_id": supplier_id, "demand": demand},
-    )
     text = ("Make your offer." if counter_price is None
             else f"The OEM has countered: it can pay at most ${counter_price:.2f}/unit. Revise your offer.")
-    msg = types.Content(role="user", parts=[types.Part(text=text)])
-    final = ""
-    async for ev in runner.run_async(user_id="orchestrator", session_id=session.id, new_message=msg):
-        if ev.is_final_response() and ev.content and ev.content.parts:
-            final = ev.content.parts[0].text or ""
+    # The scoped state is the entire isolation boundary: only THIS supplier + public
+    # demand. Same state whether the turn runs in-process or on the deployed agent.
+    final = await run_agent_text(supplier_offer_agent, text,
+                                 state={"supplier_id": supplier_id, "demand": demand})
     offer = _parse_offer(final)
     if not offer:                                   # agent misbehaved → safe deterministic stand-in
         offer = solicit_offer_fallback(supplier_id, demand, counter_price)
@@ -189,9 +241,7 @@ async def oem_decide_counter(offer: dict, demand: dict, ceiling: float, num_alte
     so the UI can show WHY it countered hard or soft instead of just the number."""
     if oem_counter_agent is None:
         return ceiling, ""
-    from google.adk.runners import Runner
-    from google.adk.sessions import InMemorySessionService
-    from google.genai import types
+    from .agent_runner import run_agent_text
 
     ctx = {
         "supplier_id": offer["supplier_id"],
@@ -202,14 +252,8 @@ async def oem_decide_counter(offer: dict, demand: dict, ceiling: float, num_alte
         "deadline_weeks": demand["deadline_weeks"],
         "num_alternative_suppliers": num_alternatives,
     }
-    svc = InMemorySessionService()
-    runner = Runner(agent=oem_counter_agent, app_name="commitmesh", session_service=svc)
-    session = await svc.create_session(app_name="commitmesh", user_id="oem", state={"counter_ctx": ctx})
-    msg = types.Content(role="user", parts=[types.Part(text="Decide your counter.")])
-    final = ""
-    async for ev in runner.run_async(user_id="oem", session_id=session.id, new_message=msg):
-        if ev.is_final_response() and ev.content and ev.content.parts:
-            final = ev.content.parts[0].text or ""
+    final = await run_agent_text(oem_counter_agent, "Decide your counter.",
+                                 state={"counter_ctx": ctx})
     try:
         t = final.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
         parsed = json.loads(t)
@@ -345,8 +389,33 @@ async def break_commitment_and_resolve(ledger: neg.CommitmentLedger, commitment_
     broken_sid, need = broken.supplier_id, broken.quantity
     ledger.break_commitment(commitment_id)
 
-    others = [s for s in supplier_ids if s != broken_sid]
+    # Re-source to a RESERVE supplier — one that isn't already committed. The committed
+    # suppliers are already supplying at their negotiated volume; pulling on their thin
+    # leftover headroom would only fragment the backfill across rows and leave a phantom
+    # shortfall. Selective re-negotiation (the product's promise) backfills the broken
+    # commitment onto a single reserve, so the gap is covered cleanly or escalated honestly.
+    committed_sids = {r.supplier_id for r in ledger.rows.values() if r.status == "Committed"}
+    others = [s for s in supplier_ids if s != broken_sid and s not in committed_sids]
+    if not others:                                   # no untapped reserve — fall back to any other supplier's headroom
+        others = [s for s in supplier_ids if s != broken_sid]
     reoffers = list(await asyncio.gather(*(ask(s) for s in others))) if others else []
+    opening = {o["supplier_id"]: o["unit_price"] for o in reoffers}
+
+    # One counter round, exactly like the main negotiation: an over-ceiling reserve
+    # quote is countered by the OEM agent and the supplier revises (never below its own
+    # cost). Without this the backfill would pay a reserve's opening price even though
+    # the same supplier accepted far less moments earlier in the main round.
+    async def counter_round(o):
+        if o["unit_price"] <= ceiling:
+            return o
+        cp, _ = (await oem_decide_counter(o, demand, ceiling, max(0, len(others) - 1))
+                 if live else (ceiling, ""))
+        revised = (await solicit_offer_llm(o["supplier_id"], demand, cp) if live
+                   else solicit_offer_fallback(o["supplier_id"], demand, cp))
+        return {**o, "unit_price": min(o["unit_price"], revised["unit_price"]),
+                "stance": revised.get("stance", "counter")}
+    reoffers = list(await asyncio.gather(*(counter_round(o) for o in reoffers)))
+
     already = {r.supplier_id: r.quantity for r in ledger.rows.values() if r.status == "Committed"}
     for o in reoffers:                               # only offer headroom beyond what they already committed
         o["quantity"] = max(0, o["quantity"] - already.get(o["supplier_id"], 0))
@@ -360,5 +429,8 @@ async def break_commitment_and_resolve(ledger: neg.CommitmentLedger, commitment_
     return {
         "broken_supplier": broken_sid, "need": need, "covered": covered,
         "shortfall": need - covered, "escalated": need - covered > 0,
+        "reserve_supplier": best["supplier_id"] if best else None,
+        "reserve_price": best["unit_price"] if best else None,
+        "reserve_opening_price": opening.get(best["supplier_id"]) if best else None,
         "commitments": ledger.to_list(),
     }

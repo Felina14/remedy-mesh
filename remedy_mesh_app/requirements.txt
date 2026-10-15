@@ -8,3 +8,6 @@ twilio==9.12.0
 reportlab==5.0.1
 # Optional: only imported when REMEDY_BACKEND=firestore (the demo uses the bundled JSON corpus).
 google-cloud-firestore>=2.16.0
+# Agent Engine client — the app calls the agents deployed as separate managed services
+# on Vertex AI Agent Engine (REMEDY_AGENT_ENGINE=1). Same version the agents were deployed with.
+google-cloud-aiplatform[agent_engines]==2.5.0

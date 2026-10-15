@@ -22,8 +22,20 @@ from functools import lru_cache
 
 BACKEND = os.environ.get("REMEDY_BACKEND", "json").lower()
 
-_DEFAULT = pathlib.Path(__file__).resolve().parents[2] / "remedy_mesh_synthetic_data" / "input"
-DATA_DIR = pathlib.Path(os.environ.get("REMEDY_DATA_DIR", str(_DEFAULT)))
+# Corpus location, in priority order:
+#   1. REMEDY_DATA_DIR (explicit override)
+#   2. remedy_mesh/_corpus (bundled INSIDE the package — resolves relative to this
+#      file, so it works when the package is deployed to Agent Engine regardless of cwd)
+#   3. the repo's remedy_mesh_synthetic_data/input (normal local / Cloud Run layout)
+_PKG_CORPUS = pathlib.Path(__file__).resolve().parent / "_corpus"
+_REPO_INPUT = pathlib.Path(__file__).resolve().parents[2] / "remedy_mesh_synthetic_data" / "input"
+_env_dir = os.environ.get("REMEDY_DATA_DIR")
+if _env_dir:
+    DATA_DIR = pathlib.Path(_env_dir)
+elif (_REPO_INPUT / "cases.json").exists():
+    DATA_DIR = _REPO_INPUT
+else:
+    DATA_DIR = _PKG_CORPUS
 
 
 # ----------------------------------------------------------------- JSON backend

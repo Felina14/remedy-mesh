@@ -1,0 +1,256 @@
+<title>Remedy Mesh Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one engineering schematic (wide SVG in its own scroller), then the run sequence and the facts behind it. */
+:root{
+  --bg:#f3f5f8; --panel:#ffffff; --ink:#16202b; --ink-2:#465566; --ink-3:#6b7a8b; --line:#c6d0db;
+  --run:#2c64c8; --run-wash:#e7eefb;
+  --agent:#0d7f74; --agent-wash:#e1f2ef;
+  --db:#a8690f; --db-wash:#fbf0dc;
+  --ext:#8c4357; --ext-wash:#f7e8ec;
+  --human:#2f7a4c; --human-wash:#e3f1e8;
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f141a; --panel:#18202a; --ink:#e7edf3; --ink-2:#a9b6c4; --ink-3:#8796a6; --line:#2f3b48;
+  --run:#7aa7f5; --run-wash:#1b2a44; --agent:#4fc7b8; --agent-wash:#13312e;
+  --db:#e5b25a; --db-wash:#382a12; --ext:#e392a6; --ext-wash:#3a1f27; --human:#77c99a; --human-wash:#173022;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --panel:#18202a; --ink:#e7edf3; --ink-2:#a9b6c4; --ink-3:#8796a6; --line:#2f3b48;
+  --run:#7aa7f5; --run-wash:#1b2a44; --agent:#4fc7b8; --agent-wash:#13312e;
+  --db:#e5b25a; --db-wash:#382a12; --ext:#e392a6; --ext-wash:#3a1f27; --human:#77c99a; --human-wash:#173022;
+  color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--f-display);line-height:1.5}
+.wrap{max-width:1320px;margin:0 auto;padding-block:32px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+header{display:grid;gap:6px}
+.eyebrow{font:500 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-size:clamp(26px,3.4vw,38px);font-weight:700;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--ink-2);max-width:68ch;font-size:15.5px}
+.scroller{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+svg{display:block;min-width:1100px;width:100%;height:auto}
+/* svg styling through tokens */
+.t{fill:var(--ink);font-family:var(--f-display)} .t2{fill:var(--ink-2);font-family:var(--f-display)}
+.m{fill:var(--ink-3);font-family:var(--f-mono)} .ttl{font-weight:700} .sb{font-weight:600}
+.zone-run{fill:var(--run-wash);stroke:var(--run)} .zone-agent{fill:var(--agent-wash);stroke:var(--agent)}
+.zone-db{fill:var(--db-wash);stroke:var(--db)} .zone-gem{fill:var(--panel);stroke:var(--agent)}
+.mod{fill:var(--panel);stroke:var(--line)} .mod-key{fill:var(--panel);stroke:var(--run);stroke-width:1.6}
+.grp{fill:none;stroke:var(--agent);stroke-dasharray:4 4;stroke-opacity:.7}
+.chip{fill:var(--panel);stroke:var(--agent)} .dbchip{fill:var(--panel);stroke:var(--db)}
+.ext{fill:var(--ext-wash);stroke:var(--ext)} .ppl{fill:var(--human-wash);stroke:var(--human)}
+.e{fill:none;stroke:var(--ink-2);stroke-width:1.5} .e-db{stroke:var(--db)} .e-ag{stroke:var(--agent)} .e-h{stroke:var(--human)} .e-x{stroke:var(--ext)}
+.ah{fill:var(--ink-2)} .ah-db{fill:var(--db)} .ah-ag{fill:var(--agent)} .ah-h{fill:var(--human)} .ah-x{fill:var(--ext)}
+.tag-run{fill:var(--run)} .tag-ag{fill:var(--agent)} .tag-db{fill:var(--db)} .tag-x{fill:var(--ext)} .tag-h{fill:var(--human)}
+.cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px}
+@media (max-width:860px){.cols{grid-template-columns:1fr}}
+h2{font-size:18px;margin:0 0 10px;font-weight:700}
+ol.flow{margin:0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
+ol.flow li{counter-increment:s;display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start}
+ol.flow li::before{content:counter(s);font:500 12px/26px var(--f-mono);text-align:center;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);color:var(--ink-2);background:var(--panel)}
+ol.flow b{font-weight:600}
+ol.flow span{color:var(--ink-2)}
+dl.facts{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;font-size:14.5px}
+dt{font:500 12.5px/1.6 var(--f-mono);color:var(--ink-3);white-space:nowrap}
+dd{margin:0;color:var(--ink)}
+.note{font-size:13px;color:var(--ink-3);margin:0}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Recall scope-drift · Campaign 24V-104 · Isar Automobile</div>
+    <h1>Remedy Mesh Architecture</h1>
+    <p class="lede">Cloud Run runs the app and the orchestrator. Each of the 8 agents runs as its own managed service on Vertex AI Agent Engine. Verdicts and allocations stay in deterministic code, agents read the case data from Firestore, and a person approves every action that leaves the system.</p>
+  </header>
+
+  <div class="scroller">
+  <svg viewBox="0 0 1280 820" role="img" aria-labelledby="dgT dgD">
+    <title id="dgT">Remedy Mesh system architecture</title>
+    <desc id="dgD">Analyst and Approver use a Cloud Run app. The app calls eight agents on Vertex AI Agent Engine, which use Gemini. The app and four agents read case data from Firestore. Calls go through Twilio; approved documents go out through Gmail.</desc>
+    <defs>
+      <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="adb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-db" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="aag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-ag" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-h" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="ax" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-x" d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>
+
+    <!-- ===== left column: people + external services, each aligned with the module it talks to ===== -->
+    <text class="m" x="24" y="98" font-size="11" letter-spacing="1">PEOPLE &amp; OUTSIDE SERVICES</text>
+    <rect class="ppl" x="24" y="120" width="180" height="46" rx="23"/>
+    <text class="t sb" x="44" y="139" font-size="13">Eleanor · Analyst</text>
+    <text class="t2" x="44" y="156" font-size="11">runs cases, places calls</text>
+
+    <rect class="ext" x="24" y="340" width="180" height="46" rx="8"/>
+    <text class="t sb" x="38" y="359" font-size="13">Supplier's phone</text>
+    <text class="t2" x="38" y="376" font-size="11">replies in their own words</text>
+
+    <rect class="ext" x="24" y="420" width="180" height="46" rx="8"/>
+    <text class="t sb" x="38" y="439" font-size="13">Twilio Voice</text>
+    <text class="t2" x="38" y="456" font-size="11">real outbound call · speech</text>
+
+    <rect class="ext" x="24" y="480" width="180" height="46" rx="8"/>
+    <text class="t sb" x="38" y="499" font-size="13">Gmail SMTP</text>
+    <text class="t2" x="38" y="516" font-size="11">PO + Part 573 emails</text>
+
+    <rect class="ppl" x="24" y="540" width="180" height="46" rx="23"/>
+    <text class="t sb" x="44" y="559" font-size="13">James · Approver</text>
+    <text class="t2" x="44" y="576" font-size="11">approves, files, decides</text>
+
+    <!-- ===== Cloud Run ===== -->
+    <rect class="zone-run" x="284" y="70" width="340" height="560" rx="14" stroke-width="1.5"/>
+    <text class="t ttl" x="304" y="96" font-size="15">Cloud Run · remedy-mesh-hybrid</text>
+    <text class="m" x="304" y="112" font-size="10.5">FastAPI orchestrator · one container</text>
+
+    <rect class="mod" x="304" y="120" width="300" height="46" rx="7"/>
+    <text class="t sb" x="318" y="139" font-size="12.5">Single-page app · REST + live SSE feed</text>
+    <text class="t2" x="318" y="156" font-size="11">agent steps stream to the screen as they happen</text>
+
+    <rect class="mod" x="304" y="180" width="300" height="46" rx="7"/>
+    <text class="t sb" x="318" y="199" font-size="12.5">Maker-checker sign-in</text>
+    <text class="t2" x="318" y="216" font-size="11">the Analyst proposes, the Approver signs off</text>
+
+    <rect class="mod-key" x="304" y="240" width="300" height="46" rx="7"/>
+    <text class="t sb" x="318" y="259" font-size="12.5">Verdict gate · deterministic evaluate_case</text>
+    <text class="t2" x="318" y="276" font-size="11">six evidence criteria; the verdict is code, not a model</text>
+
+    <rect class="mod-key" x="304" y="300" width="300" height="46" rx="7"/>
+    <text class="t sb" x="318" y="319" font-size="12.5">Negotiation core · allocation + ledger</text>
+    <text class="t2" x="318" y="336" font-size="11">split award under the $128 ceiling, re-source on decline</text>
+
+    <rect class="mod" x="304" y="360" width="300" height="46" rx="7"/>
+    <text class="t sb" x="318" y="379" font-size="12.5">Agent connector</text>
+    <text class="t2" x="318" y="396" font-size="11">one scoped session per agent turn</text>
+
+    <rect class="mod" x="304" y="420" width="300" height="46" rx="7"/>
+    <text class="t sb" x="318" y="439" font-size="12.5">Voice webhook</text>
+    <text class="t2" x="318" y="456" font-size="11">each spoken reply → Call Understanding Agent</text>
+
+    <rect class="mod" x="304" y="480" width="300" height="46" rx="7"/>
+    <text class="t sb" x="318" y="499" font-size="12.5">Drafts · purchase orders + Part 573 PDFs</text>
+    <text class="t2" x="318" y="516" font-size="11">sent only after the Approver approves</text>
+
+    <rect class="mod" x="304" y="540" width="300" height="46" rx="7"/>
+    <text class="t sb" x="318" y="559" font-size="12.5">Approval queue</text>
+    <text class="t2" x="318" y="576" font-size="11">PO · Part 573 · resolution · decline · escalation</text>
+
+    <!-- ===== Agent Engine ===== -->
+    <rect class="zone-agent" x="680" y="70" width="380" height="560" rx="14" stroke-width="1.5"/>
+    <text class="t ttl" x="700" y="96" font-size="15">Vertex AI Agent Engine · 8 managed agents</text>
+    <text class="m" x="700" y="112" font-size="10.5">Google ADK agents · each its own service</text>
+
+    <rect class="grp" x="696" y="122" width="348" height="196" rx="10"/>
+    <text class="m" x="708" y="140" font-size="10.5">LAYER 1 · EVIDENCE · claims → investigation → audit</text>
+    <rect class="chip" x="708" y="150" width="160" height="72" rx="8"/>
+    <text class="t sb" x="720" y="172" font-size="12.5">Evidence Interpreter</text>
+    <text class="t2" x="720" y="189" font-size="11">structures complaints</text>
+    <text class="tag-db" x="720" y="210" font-size="10" font-family="JetBrains Mono, monospace">Flash · reads Firestore</text>
+    <rect class="chip" x="876" y="150" width="160" height="72" rx="8"/>
+    <text class="t sb" x="888" y="172" font-size="12.5">Remedy Investigator</text>
+    <text class="t2" x="888" y="189" font-size="11">runs the evaluation</text>
+    <text class="tag-db" x="888" y="210" font-size="10.5" font-family="JetBrains Mono, monospace">Pro · reads Firestore</text>
+    <rect class="chip" x="708" y="232" width="160" height="72" rx="8"/>
+    <text class="t sb" x="720" y="254" font-size="12.5">Verification Agent</text>
+    <text class="t2" x="720" y="271" font-size="11">independent policy audit</text>
+    <text class="tag-db" x="720" y="292" font-size="10.5" font-family="JetBrains Mono, monospace">Pro · reads Firestore</text>
+    <rect class="chip" x="876" y="232" width="160" height="72" rx="8"/>
+    <text class="t sb" x="888" y="254" font-size="12.5">Resolution Agent</text>
+    <text class="t2" x="888" y="271" font-size="11">explains the verdict</text>
+    <text class="tag-ag" x="888" y="292" font-size="10.5" font-family="JetBrains Mono, monospace">Flash</text>
+
+    <rect class="grp" x="696" y="330" width="348" height="172" rx="10"/>
+    <text class="m" x="708" y="348" font-size="10.5">LAYER 2 · NEGOTIATION MESH</text>
+    <rect class="chip" x="708" y="358" width="160" height="72" rx="8"/>
+    <text class="t sb" x="720" y="380" font-size="12.5">Supplier Offer Agent</text>
+    <text class="t2" x="720" y="397" font-size="11">one agent, run per supplier</text>
+    <text class="tag-db" x="720" y="418" font-size="10.5" font-family="JetBrains Mono, monospace">Flash · own data only</text>
+    <rect class="chip" x="876" y="358" width="160" height="72" rx="8"/>
+    <text class="t sb" x="888" y="380" font-size="12.5">OEM Counter Agent</text>
+    <text class="t2" x="888" y="397" font-size="11">counters each offer</text>
+    <text class="tag-ag" x="888" y="418" font-size="10.5" font-family="JetBrains Mono, monospace">Flash · count only</text>
+    <rect class="chip" x="708" y="440" width="328" height="50" rx="8"/>
+    <text class="t sb" x="720" y="461" font-size="12.5">Re-source Narration Agent</text>
+    <text class="t2" x="720" y="478" font-size="11">explains the backup supplier after a decline</text>
+    <text class="tag-ag" x="990" y="461" font-size="10.5" font-family="JetBrains Mono, monospace">Flash</text>
+
+    <rect class="grp" x="696" y="514" width="348" height="104" rx="10"/>
+    <text class="m" x="708" y="532" font-size="10.5">PHONE CALL</text>
+    <rect class="chip" x="708" y="542" width="328" height="64" rx="8"/>
+    <text class="t sb" x="720" y="564" font-size="12.5">Call Understanding Agent</text>
+    <text class="t2" x="720" y="582" font-size="11">reads confirm, decline, partial or counter</text>
+    <text class="tag-ag" x="720" y="598" font-size="10.5" font-family="JetBrains Mono, monospace">Flash · answers in about 2 s</text>
+
+    <!-- ===== Gemini ===== -->
+    <rect class="zone-gem" x="1100" y="300" width="160" height="96" rx="12" stroke-width="1.5"/>
+    <text class="t ttl" x="1116" y="326" font-size="14">Gemini 2.5</text>
+    <text class="t2" x="1116" y="345" font-size="11.5">Flash + Pro</text>
+    <text class="m" x="1116" y="364" font-size="10.5">on Vertex AI</text>
+    <text class="m" x="1116" y="381" font-size="10.5">us-central1</text>
+
+    <!-- ===== Firestore ===== -->
+    <rect class="zone-db" x="284" y="680" width="776" height="118" rx="14" stroke-width="1.5"/>
+    <text class="t ttl" x="304" y="706" font-size="15">Firestore · the case database</text>
+    <text class="m" x="304" y="722" font-size="10.5">Native mode · us-central1 · 603 records + policy</text>
+    <g font-family="JetBrains Mono, monospace" font-size="11.5">
+      <rect class="dbchip" x="304" y="736" width="100" height="44" rx="7"/><text class="t" x="316" y="755">cases</text><text class="tag-db" x="316" y="771">9</text>
+      <rect class="dbchip" x="412" y="736" width="112" height="44" rx="7"/><text class="t" x="424" y="755">complaints</text><text class="tag-db" x="424" y="771">503</text>
+      <rect class="dbchip" x="532" y="736" width="136" height="44" rx="7"/><text class="t" x="544" y="755">production_lots</text><text class="tag-db" x="544" y="771">30</text>
+      <rect class="dbchip" x="676" y="736" width="140" height="44" rx="7"/><text class="t" x="688" y="755">remedy_campaigns</text><text class="tag-db" x="688" y="771">7</text>
+      <rect class="dbchip" x="824" y="736" width="92" height="44" rx="7"/><text class="t" x="836" y="755">suppliers</text><text class="tag-db" x="836" y="771">4</text>
+      <rect class="dbchip" x="924" y="736" width="64" height="44" rx="7"/><text class="t" x="934" y="755">dealers</text><text class="tag-db" x="934" y="771">50</text>
+      <rect class="dbchip" x="996" y="736" width="52" height="44" rx="7"/><text class="t" x="1004" y="755">policy</text><text class="tag-db" x="1004" y="771">rules</text>
+    </g>
+
+    <!-- ===== edges ===== -->
+    <path class="e e-h" d="M204,143 L302,143" marker-end="url(#ah)"/>
+    <text class="m" x="222" y="136" font-size="10">HTTPS</text>
+    <path class="e e-x" d="M114,386 L114,418" marker-start="url(#ax)" marker-end="url(#ax)"/>
+    <path class="e e-x" d="M204,443 L302,443" marker-start="url(#ax)" marker-end="url(#ax)"/>
+    <text class="m" x="222" y="436" font-size="10">voice</text>
+    <path class="e e-x" d="M302,503 L206,503" marker-end="url(#ax)"/>
+    <text class="m" x="222" y="496" font-size="10">approved</text>
+    <path class="e e-h" d="M204,563 L302,563" marker-end="url(#ah)"/>
+    <text class="m" x="222" y="556" font-size="10">sign-off</text>
+
+    <path class="e e-ag" d="M604,383 L678,383" stroke-width="2.2" marker-end="url(#aag)"/>
+    <text class="m" x="610" y="374" font-size="10">8 agents</text>
+    <path class="e e-ag" d="M1060,348 L1098,348" marker-end="url(#aag)"/>
+
+    <path class="e e-db" d="M454,632 L454,678" marker-end="url(#adb)"/>
+    <text class="m" x="462" y="660" font-size="10">case data</text>
+    <path class="e e-db" d="M870,632 L870,678" marker-end="url(#adb)"/>
+    <text class="m" x="878" y="660" font-size="10">agent tool reads</text>
+  </svg>
+  </div>
+
+  <div class="cols">
+    <section>
+      <h2>One confirmed case, end to end</h2>
+      <ol class="flow">
+        <li><div><b>Eleanor opens a case.</b> <span>The run streams live to her screen over SSE.</span></div></li>
+        <li><div><b>Layer 1 runs on Agent Engine.</b> <span>The Interpreter, Investigator and Verifier read the case's complaints, lots and policy from Firestore, each passing its output to the next.</span></div></li>
+        <li><div><b>The verdict gate decides.</b> <span>Deterministic code checks the six evidence criteria. The Verifier audits that verdict independently, and any disagreement is flagged for a person.</span></div></li>
+        <li><div><b>Layer 2 negotiates.</b> <span>The Supplier Offer Agent runs once per supplier, scoped to that supplier's own cost and capacity. The OEM Counter Agent counters each offer and never sees a rival's bid.</span></div></li>
+        <li><div><b>A real phone call confirms each deal.</b> <span>Twilio places the call and the Call Understanding Agent reads every spoken reply.</span></div></li>
+        <li><div><b>A decline is re-sourced live.</b> <span>The reserve supplier is re-quoted and countered, and the Re-source Narration Agent explains the choice.</span></div></li>
+        <li><div><b>Drafts reach the approval queue.</b> <span>The purchase orders and the NHTSA Part 573 amendment wait for James.</span></div></li>
+        <li><div><b>James approves.</b> <span>Only then does Gmail send the PO or file the amendment. He also acknowledges declines and decides escalations.</span></div></li>
+      </ol>
+    </section>
+    <section>
+      <h2>What runs where</h2>
+      <dl class="facts">
+        <dt>Cloud Run</dt><dd>The app, the orchestrator, the deterministic verdict and allocation code, the Twilio webhook and document drafting.</dd>
+        <dt>Agent Engine</dt><dd>8 ADK agents, each a separate managed service. Each turn gets its own session, so no state carries over between suppliers.</dd>
+        <dt>Gemini</dt><dd>2.5 Flash for most turns. 2.5 Pro for the Investigator and Verifier.</dd>
+        <dt>Firestore</dt><dd>9 cases, 503 complaints, 30 production lots, 7 campaigns, 4 parties, 50 dealers, plus the policy thresholds.</dd>
+        <dt>Isolation</dt><dd>A supplier sees only its own numbers. The OEM sees only a count of alternatives.</dd>
+        <dt>Humans</dt><dd>Nothing leaves the system until the Approver signs off.</dd>
+      </dl>
+      <p class="note" style="margin-top:14px">All companies, VINs and complaints are synthetic, modelled on real NHTSA recall patterns.</p>
+    </section>
+  </div>
+</div>

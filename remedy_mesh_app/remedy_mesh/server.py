@@ -30,11 +30,35 @@ from . import callunderstanding as cu
 from . import purchase_order as po
 from . import part573
 from . import email_po
+from . import remote_agents
 
 app = FastAPI(title="Remedy Mesh")
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def _warm_agent_engines():
+    """Open a handle to every deployed agent up front, in the background, so the first
+    real turn (e.g. a live phone call) doesn't pay the client-setup cost."""
+    if not remote_agents.ENABLED:
+        return
+
+    def _warm():
+        for key in list(remote_agents.ENGINES):
+            try:
+                remote_agents._engine(key)
+            except Exception as e:  # never block startup on a warm-up miss
+                print(f"[agent-engine] warm-up failed for {key}: {e}")
+    asyncio.get_event_loop().run_in_executor(None, _warm)
+
+
+@app.get("/api/agent_engines")
+def api_agent_engines():
+    """Which agents run as separate Agent Engine services, and the latency of the
+    most recent remote calls — evidence that the run really used them."""
+    return remote_agents.status()
 
 TIMELINES: dict[str, list] = {}       # case_id -> timeline events
 LEDGERS: dict[str, object] = {}       # case_id -> CommitmentLedger (for reneg)
@@ -43,6 +67,7 @@ CASE_RESULTS: dict[str, dict] = {}    # case_id -> last full run result (l1/l2/r
                                        # nothing re-runs just because James opened the case.
 PENDING_CALLS: dict[str, dict] = {}   # commitment_id -> {case_id, supplier_id, quantity, unit_price, deadline_weeks}
 CALL_CONVOS: dict[str, dict] = {}     # commitment_id -> {order, history:[{actor,text}]}  (Tier-2 multi-turn)
+BACKFILL_NOTES: dict[str, dict] = {}  # case_id -> {reserve_sid, reserve_name, covered, price, reasoning, ...}  (latest re-source)
 
 # Human-in-the-loop queue. The agent DRAFTS (PO ready, declined, escalation); a human
 # acts (Approve & Send). Newest first. PDFs live in _PO_DIR and are served on demand.
@@ -204,7 +229,7 @@ async def _finalize_call_outcome(commitment_id: str, interp: dict) -> None:
 
     if interp.get("outcome") == "declined":
         sup = _supplier(row.supplier_id)
-        _add_notification(
+        decline_n = _add_notification(
             type="rejected", case_id=case_id, commitment_id=commitment_id,
             supplier_id=row.supplier_id, supplier_name=sup.get("party_name", row.supplier_id),
             title=f"Declined — {sup.get('party_name', row.supplier_id)}",
@@ -213,13 +238,50 @@ async def _finalize_call_outcome(commitment_id: str, interp: dict) -> None:
         oem = next(s for s in data.suppliers() if s["role"] == "oem")
         sids = [s["party_id"] for s in data.suppliers() if s["role"] == "supplier"]
         demand = {"quantity": oem["target_units"], "deadline_weeks": oem["deadline_weeks"]}
+        # GENUINE re-negotiation: the reserve supplier is re-solicited by a REAL LLM call
+        # (isolated Gemini session), never a hardcoded fallback — the same live agent that
+        # ran the primary negotiation. Takes real seconds; that is the point.
         res = await layer2.break_commitment_and_resolve(
-            ledger, commitment_id, demand, oem["max_unit_cost"], sids, use_llm=False)
+            ledger, commitment_id, demand, oem["max_unit_cost"], sids, use_llm=True)
         tl = TIMELINES.setdefault(case_id, [])
-        tl.append({"seq": len(tl) + 1, "phase": "ledger", "actor": "SelectiveReneg",
-                   "text": f"{res['broken_supplier']} declined on the call — reopened ONLY that "
-                           f"commitment; backfill {res['covered']}, shortfall {res['shortfall']}",
-                   "outcome": "escalated" if res["escalated"] else "re-committed", "meta": res})
+        reserve_sid = res.get("reserve_supplier")
+        if reserve_sid and not res["escalated"]:
+            # The agent re-runs sourcing and NARRATES why this reserve is the right backup —
+            # the same resolution-loop pattern as Layer 1, surfaced to the Analyst before the
+            # reserve's confirmation call. Deterministic choice, LLM reasoning, safe fallback.
+            rsup = _supplier(reserve_sid)
+            ctx = {
+                "broken_name": sup.get("party_name", row.supplier_id),
+                "reserve_name": rsup.get("party_name", reserve_sid),
+                "covered": res["covered"], "price": res.get("reserve_price") or row.unit_price,
+                "ceiling": oem["max_unit_cost"], "deadline_weeks": oem["deadline_weeks"],
+            }
+            # Genuine agent reasoning (real LLM), with the deterministic text only as a
+            # safety net if the model is unavailable — same in local and on Cloud Run.
+            reasoning = await layer2.narrate_resource(ctx, use_llm=True)
+            BACKFILL_NOTES[case_id] = {
+                **ctx, "broken_sid": row.supplier_id, "reserve_sid": reserve_sid,
+                "reasoning": reasoning, "shortfall": res["shortfall"],
+            }
+            tl.append({"seq": len(tl) + 1, "phase": "reneg", "actor": "ResolutionAgent",
+                       "text": reasoning, "outcome": "re-committed",
+                       "meta": {**res, "reserve_name": ctx["reserve_name"], "reasoning": reasoning}})
+            # The Approver sees what ACTUALLY happened after the decline, from the live
+            # re-source result — not a stale "re-sourcing…" line.
+            decline_n["detail"] = (f"Declined {row.quantity:,} units on the call. Re-sourced to "
+                                   f"{ctx['reserve_name']} @ ${ctx['price']:,.2f} — that supplier "
+                                   f"still needs its own confirmation call.")
+            decline_n["resource"] = {"reserve_supplier": reserve_sid, "reserve_name": ctx["reserve_name"],
+                                     "price": ctx["price"], "covered": res["covered"],
+                                     "reasoning": reasoning}
+        else:
+            tl.append({"seq": len(tl) + 1, "phase": "reneg", "actor": "ResolutionAgent",
+                       "text": f"{res['broken_supplier']} declined — reopened only that commitment; "
+                               f"no single reserve could cover the {res['shortfall']:,}-unit gap, escalating "
+                               f"for a human decision.",
+                       "outcome": "escalated", "meta": res})
+            decline_n["detail"] = (f"Declined {row.quantity:,} units on the call. No single reserve "
+                                   f"could cover the {res['shortfall']:,}-unit gap — escalated.")
         # NOTE: we do NOT draft the backfill PO here. The re-source has repaired the
         # ledger row to the reserve supplier (Ridgeline), but — exactly like the primary
         # suppliers — no PO is drafted until that supplier is CONFIRMED by call. The row
@@ -228,8 +290,12 @@ async def _finalize_call_outcome(commitment_id: str, interp: dict) -> None:
             _add_notification(
                 type="escalation", case_id=case_id, commitment_id=commitment_id,
                 title=f"Escalation — {res['shortfall']:,} units uncovered",
-                detail=f"After re-sourcing {res['broken_supplier']}'s decline, {res['shortfall']:,} "
+                detail=f"After re-sourcing {sup.get('party_name', res['broken_supplier'])}'s decline, {res['shortfall']:,} "
                        f"units remain uncovered. Needs a human decision or another supplier.",
+                need=res["need"], covered=res["covered"], shortfall=res["shortfall"],
+                broken_supplier=res["broken_supplier"],
+                broken_name=sup.get("party_name", res["broken_supplier"]),
+                reserve_supplier=res.get("reserve_supplier"),
                 transcript=[])
     else:
         qty = interp.get("agreed_quantity") or row.quantity
@@ -324,6 +390,7 @@ def api_overview():
 async def api_run(case_id: str, use_llm: bool = False):
     r = await pipeline.run_pipeline(case_id, use_llm=use_llm, confirm=False)  # no auto/simulated call; Analyst places the REAL call via the button
     TIMELINES[case_id] = r["timeline"]
+    BACKFILL_NOTES.pop(case_id, None)            # a fresh run resets the ledger — drop any stale re-source note
     if r.get("confirmed"):
         _make_573_draft(case_id, r.get("l1"))   # confirmed scope drift -> draft the regulatory amendment
     if r.get("l2"):
@@ -360,6 +427,7 @@ async def api_run_stream(case_id: str, use_llm: bool = False, token: str | None 
     async def run_live():
         r = await pipeline.run_pipeline(case_id, use_llm=use_llm, confirm=False, on_event=on_event)  # no auto/simulated call
         TIMELINES[case_id] = r["timeline"]
+        BACKFILL_NOTES.pop(case_id, None)            # a fresh run resets the ledger — drop any stale re-source note
         if r.get("confirmed"):
             _make_573_draft(case_id, r.get("l1"))   # confirmed scope drift -> draft the regulatory amendment
         if r.get("l2"):
@@ -422,7 +490,8 @@ def api_commitments(case_id: str):
     commitment repaired to the reserve supplier), so the UI can re-render the
     allocation with a backfill commitment that still needs a confirmation call."""
     ledger = LEDGERS.get(case_id)
-    return {"case_id": case_id, "commitments": ledger.to_list() if ledger else []}
+    return {"case_id": case_id, "commitments": ledger.to_list() if ledger else [],
+            "backfill": BACKFILL_NOTES.get(case_id)}
 
 
 @app.post("/api/break/{case_id}/{commitment_id}")
@@ -447,9 +516,10 @@ async def api_break(case_id: str, commitment_id: str):
 @app.post("/api/resolve/{case_id}")
 async def api_resolve(case_id: str, request: Request,
                       session: dict = Depends(auth.require_role("Analyst"))):
-    """An Analyst resolves a non-sourcing case (the in-case resolve button). Body
-    carries the tag's action + owner + decision; the case moves to Resolved with
-    an audit stamp naming who resolved it."""
+    """An Analyst PROPOSES a resolution for a non-sourcing case. This does NOT resolve
+    the case — it files a proposal (action + the agent's reasoning) into the Approver's
+    queue for Approve/Return, the same maker-checker split as POs and Part 573 amendments.
+    The case only closes once the Approver approves."""
     try:
         body = await request.json()
     except Exception:
@@ -457,12 +527,31 @@ async def api_resolve(case_id: str, request: Request,
     case = data.case(case_id)
     if not case:
         return {"error": "case not found"}
+    if CASE_STATUS.get(case_id, {}).get("status") == "resolved":
+        return {"error": "already resolved"}
     action = body.get("action") or "Resolved"
     owner = body.get("owner")
     decision = body.get("decision") or ""
-    st = _mark_resolved(case_id, action, owner, via="resolution", decision=decision,
-                        by=f"{session['name']} ({session['role']})")
-    return {"ok": True, "case_id": case_id, "status": st}
+    interpretation = body.get("interpretation") or ""
+    recommended = body.get("recommended_action") or ""
+    # idempotent: one OPEN proposal per case (re-proposing after a Return is fine)
+    existing = next((x for x in NOTIFICATIONS if x["type"] == "resolution_proposal"
+                     and x.get("case_id") == case_id and x["status"] == "pending"), None)
+    if existing:
+        return {"ok": True, "notification": _public_notif(existing), "already": True}
+    proposed_by = f"{session['name']} ({session['role']})"
+    n = _add_notification(
+        type="resolution_proposal", case_id=case_id, action=action, owner=owner,
+        decision=decision, interpretation=interpretation, recommended_action=recommended,
+        title=f"Resolution — {action}",
+        detail=f"{case.get('oem','')} · {case_id}" + (f" → {owner}" if owner else ""),
+        proposed_by=proposed_by)
+    tl = TIMELINES.setdefault(case_id, [])
+    tl.append({"seq": len(tl) + 1, "phase": "resolved", "actor": proposed_by,
+               "text": f"Proposed resolution — {action}" + (f" ({owner})" if owner else "")
+                       + "; awaiting the Approver's decision.",
+               "outcome": "proposed", "meta": {"notif_id": n["id"]}})
+    return {"ok": True, "notification": _public_notif(n)}
 
 
 @app.post("/api/login")
@@ -535,6 +624,44 @@ async def api_notification_approve(notif_id: str, request: Request,
     n = next((x for x in NOTIFICATIONS if x["id"] == notif_id), None)
     if not n:
         return {"error": "not found"}
+    # A resolution proposal: the Approver signs off on the Analyst's recommended action,
+    # and ONLY now does the case close — no email, just the maker-checker approval.
+    if n["type"] == "resolution_proposal":
+        if n["status"] == "approved":
+            return {"ok": True, "already": True, "notification": _public_notif(n)}
+        if n["status"] == "declined":
+            return {"error": "already returned — cannot approve"}
+        by = f"{session['name']} ({session['role']})"
+        _mark_resolved(n["case_id"], n.get("action", "Resolved"), n.get("owner"),
+                       via="resolution", decision=n.get("decision", ""), by=by)
+        n["status"] = "approved"
+        n["approved_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        n["approved_by"] = by
+        return {"ok": True, "notification": _public_notif(n), "case_resolved": True}
+    # An escalation (a re-source that could not cover the whole gap): the Approver
+    # accepts the partial cover — the covered units go ahead and the uncovered units
+    # stay recorded as an open sourcing gap. A human decision, logged to the case.
+    if n["type"] == "escalation":
+        if n["status"] == "approved":
+            return {"ok": True, "already": True, "notification": _public_notif(n)}
+        if n["status"] == "declined":
+            return {"error": "already returned — cannot accept"}
+        by = f"{session['name']} ({session['role']})"
+        n["status"] = "approved"
+        n["approved_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        n["approved_by"] = by
+        n["decision"] = "accept_partial"
+        short = int(n.get("shortfall") or 0)
+        n["detail"] = (f"{by} accepted partial cover: {int(n.get('covered') or 0):,} of "
+                       f"{int(n.get('need') or 0):,} units go ahead; {short:,} units stay an open "
+                       f"sourcing gap.")
+        if n.get("case_id"):
+            tl = TIMELINES.setdefault(n["case_id"], [])
+            tl.append({"seq": len(tl) + 1, "phase": "resolved", "actor": by,
+                       "text": f"Accepted partial cover after {n.get('broken_name', 'the supplier')}'s "
+                               f"decline — {short:,} units left as an open sourcing gap.",
+                       "outcome": "accepted", "meta": {"notif_id": notif_id}})
+        return {"ok": True, "notification": _public_notif(n)}
     if n["type"] != "po_draft":
         return {"error": f"cannot approve a '{n['type']}' notification"}
     if n["status"] == "sent":
@@ -568,6 +695,25 @@ async def api_notification_approve(notif_id: str, request: Request,
             "case_resolved": bool(resolved)}
 
 
+@app.post("/api/notifications/{notif_id}/acknowledge")
+async def api_notification_acknowledge(notif_id: str,
+                                       session: dict = Depends(auth.require_role("Approver"))):
+    """An Approver acknowledges a supplier DECLINE: a human has seen that the supplier
+    backed out and how the gap was re-sourced. Nothing is sent; it clears the queue and
+    records who acknowledged it and when."""
+    n = next((x for x in NOTIFICATIONS if x["id"] == notif_id), None)
+    if not n:
+        return {"error": "not found"}
+    if n["type"] != "rejected":
+        return {"error": f"cannot acknowledge a '{n['type']}' notification"}
+    if n["status"] == "acknowledged":
+        return {"ok": True, "already": True, "notification": _public_notif(n)}
+    n["status"] = "acknowledged"
+    n["acknowledged_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    n["acknowledged_by"] = f"{session['name']} ({session['role']})"
+    return {"ok": True, "notification": _public_notif(n)}
+
+
 @app.post("/api/notifications/{notif_id}/reject")
 async def api_notification_reject(notif_id: str,
                                   session: dict = Depends(auth.require_role("Approver"))):
@@ -576,9 +722,9 @@ async def api_notification_reject(notif_id: str,
     n = next((x for x in NOTIFICATIONS if x["id"] == notif_id), None)
     if not n:
         return {"error": "not found"}
-    if n["type"] not in ("po_draft", "part573_draft"):
+    if n["type"] not in ("po_draft", "part573_draft", "resolution_proposal", "escalation"):
         return {"error": f"cannot decline a '{n['type']}' notification"}
-    if n["status"] in ("sent", "filed"):
+    if n["status"] in ("sent", "filed", "approved"):
         return {"error": "already actioned — cannot decline"}
     n["status"] = "declined"
     n["declined_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -589,6 +735,15 @@ async def api_notification_reject(notif_id: str,
         if n["type"] == "part573_draft":
             audit_text = (f"Returned Part 573 amendment {n.get('memo_number', notif_id)} "
                           f"(campaign {n.get('nhtsa_number', '')}) to the Analyst for revision.")
+        elif n["type"] == "resolution_proposal":
+            audit_text = (f"Returned the proposed resolution '{n.get('action', '')}' to the "
+                          f"Analyst — case stays open for a different call.")
+        elif n["type"] == "escalation":
+            short = int(n.get("shortfall") or 0)
+            audit_text = (f"Returned the {short:,}-unit shortfall to the Analyst to source from "
+                          f"another supplier — case stays open.")
+            n["detail"] = (f"{n['declined_by']} returned this to the Analyst: source the remaining "
+                           f"{short:,} units from another supplier.")
         else:
             audit_text = (f"Declined PO draft {n.get('po_number', notif_id)} "
                           f"for {n.get('supplier_name', n.get('supplier_id', ''))}.")
