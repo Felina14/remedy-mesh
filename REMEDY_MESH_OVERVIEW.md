@@ -440,7 +440,7 @@ pluggable data layer (`data.py`) — JSON by default, with a Firestore backend p
 
 ## 14. Live deployment (Google Cloud Run)
 
-**Live URL:** https://remedy-mesh-tl6pmvrlbq-uc.a.run.app
+**Live URL:** https://remedymesh-tl6pmvrlbq-uc.a.run.app
 *(Sign in as `eleanor` / `analyst123` or `james` / `approve123`.)*
 
 - **One container, one origin** (`Dockerfile`): the SPA, the API, and the Twilio voice webhook

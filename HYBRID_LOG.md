@@ -26,7 +26,7 @@ The **hybrid** keeps that product identical and changes *where the agents run*:
 | Layer-1 agents | Defined but **never executed**; timeline labels shown anyway | **Actually run**, chained Interpreter → Investigator → Verifier |
 | Case data | Bundled JSON files | **Firestore** (read-only), same data |
 | Isolation | Supplier vs OEM separated by code convention | Supplier and OEM agents are **separate services** |
-| Cloud Run service | `remedy-mesh` | `remedy-mesh-hybrid` (own service account) |
+| Cloud Run service | `remedy-mesh` | `remedymesh` (own service account) |
 
 **The headline:** Cloud Run runs the app and the orchestrator; each agent is its own managed
 service; verdicts and allocations stay in deterministic code; agents read case data from
@@ -43,7 +43,7 @@ Architecture diagram: `docs/remedy-mesh-architecture.png` (slides) and
 
 | Component | Role |
 |---|---|
-| **Cloud Run** `remedy-mesh-hybrid` | FastAPI orchestrator in one container: single-page app, REST + live SSE feed, maker-checker sign-in, deterministic verdict gate (`evaluate_case`), negotiation core (allocation + ledger + re-source), agent connector, Twilio voice webhook, PO + Part 573 PDF drafting, approval queue |
+| **Cloud Run** `remedymesh` | FastAPI orchestrator in one container: single-page app, REST + live SSE feed, maker-checker sign-in, deterministic verdict gate (`evaluate_case`), negotiation core (allocation + ledger + re-source), agent connector, Twilio voice webhook, PO + Part 573 PDF drafting, approval queue |
 | **Vertex AI Agent Engine** | 8 Google ADK `LlmAgent`s, each deployed as its own managed resource |
 | **Gemini 2.5** on Vertex AI | Flash for most agents; Pro for the Investigator and Verifier |
 | **Firestore** (Native, us-central1) | The case database: read by the app and by 4 agents |
@@ -102,7 +102,8 @@ cross-run memory would weaken the supplier isolation guarantee.
 
 ## 3. Change log (newest first)
 
-All changes are in `RemedyMesh-Hybrid/` only, deployed to `remedy-mesh-hybrid` and verified unless noted.
+All changes are in `RemedyMesh-Hybrid/` only and verified unless noted. They were built and tested on the
+service `remedy-mesh-hybrid`, which was then replaced by `remedymesh` (see 3.16).
 
 ### 3.14 OEM Counter Agent never counters above its ceiling
 **File:** `layer2.py` (instructions only)
@@ -116,6 +117,34 @@ The original app has the old wording.
 **Verified:** 0 of 12 counters above $128 in-process across four leverage situations
 (several / one / no alternatives, offer far above the ceiling), and 0 of 12 on the deployed
 agent after updating it in place.
+
+### 3.17 Resilience to Gemini capacity refusals (429)
+**Files:** `config.py`, `remote_agents.py`, `pipeline.py`, `resolution.py`, `layer2.py`, `update_agents.py`, Cloud Run timeout.
+Under heavy shared demand, Gemini on Vertex answers `429 RESOURCE_EXHAUSTED` (Google's shared
+capacity, not a project quota: the project had **no** quota-exceeded records). Runs then failed
+in three ways, all fixed:
+- **Refused model calls.** Every agent's model is now an ADK `Gemini` with built-in retry
+  (5 attempts, 1 s → 16 s backoff with jitter, on 429/503 only) and, on Vertex, the **global**
+  endpoint (Google's recommendation for availability). All 8 agents redeployed in place.
+- **Refused agent turns.** The app's connector also retries a rate-limited agent turn with
+  backoff (2 s, 4 s, 8 s); the Layer-1 calls are paced on the shared dispatch schedule.
+- **Runs cut mid-negotiation.** Cloud Run ends a request after 300 s by default; slow, retrying
+  runs were killed at ~303 s. The service timeout is now **900 s**.
+- **Silent gaps.** A failed Layer-1 step used to vanish from the timeline (and skip the rest of
+  the chain). The chain now always continues, and an unavailable agent gets an honest line, e.g.
+  *"Verification Agent unavailable (timed out) — the deterministic verdict stands."* The fallback
+  line no longer claims complaints were "structured" when no agent ran; it states the count on record.
+**Verified:** CASE-001 completed end to end during heavy capacity pressure (allocation SUP_A
+33,000 + SUP_B 27,000 at $128); the one Verifier timeout was shown honestly.
+**Practical note:** on a congested day a case can take 4–5 minutes instead of ~80 s. Record at a
+calm time, and use Re-run if a step reports a capacity limit.
+
+### 3.16 Renamed the service to `remedymesh`
+Cloud Run services cannot be renamed, so the same code and settings were deployed as a new
+service, **`remedymesh`** ("hybrid" described how it was built, not the product). Same live mode,
+same 8 attached agents, same Firestore data, same service account. The README and overview live
+links on this branch now point to it, using the URL form that does not contain the project number.
+The old `remedy-mesh` service is untouched and stays as the fallback.
 
 ### 3.15 Saved to git
 The hybrid folder is now a working copy of the private repository on branch **`agent-engine`**
@@ -300,12 +329,12 @@ PO (real email with PDF). CASE-001 and CASE-009 moved to Resolved; active 9 → 
 ## 6. Operating notes
 
 ### 6.1 Cloud (live mode — real calls, nothing scripted)
-- Service `remedy-mesh-hybrid`, us-central1, min = max = 1, 1 vCPU, 1 GiB, own service account.
+- Service `remedymesh` (URL: https://remedymesh-tl6pmvrlbq-uc.a.run.app), us-central1, min = max = 1, 1 vCPU, 1 GiB, own service account.
 - Env (values live in the scratch env file, never in the repo): the original variables, plus
   `REMEDY_AGENT_ENGINE=1`, `REMEDY_AGENT_ENGINES=<json map>`, `REMEDY_BACKEND=firestore`.
   `REMEDY_DEMO_CALL` is **not** set.
-- Deploy: `gcloud run deploy remedy-mesh-hybrid --source . --region us-central1 --allow-unauthenticated --min-instances 1 --max-instances 1 --cpu 1 --memory 1Gi --service-account <hybrid-sa> --env-vars-file <env.yaml> --quiet`
-- Reset to pristine: `gcloud run services update remedy-mesh-hybrid --region=us-central1 --update-env-vars _RESET=$(date +%s) --quiet`
+- Deploy: `gcloud run deploy remedymesh --source . --region us-central1 --allow-unauthenticated --min-instances 1 --max-instances 1 --cpu 1 --memory 1Gi --service-account <hybrid-sa> --env-vars-file <env.yaml> --quiet`
+- Reset to pristine: `gcloud run services update remedymesh --region=us-central1 --update-env-vars _RESET=$(date +%s) --quiet`
 - Pristine check: active 9, resolved 0, notifications 0, `data_backend: firestore` at `/api/agent_engines`.
 
 ### 6.2 Agents

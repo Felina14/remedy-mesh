@@ -6,7 +6,7 @@
 
 *A multi-agent system built on Google ADK + Gemini (Vertex AI) for the Google AI Builder Cup 2026.*
 
-**🔗 Live demo:** https://remedy-mesh-tl6pmvrlbq-uc.a.run.app
+**🔗 Live demo:** https://remedymesh-tl6pmvrlbq-uc.a.run.app
 **Sign in:** Analyst `eleanor` / `analyst123` · Approver `james` / `approve123`
 
 </div>

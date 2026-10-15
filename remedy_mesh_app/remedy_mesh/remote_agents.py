@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import pathlib
+import random
 import threading
 import time
 
@@ -98,20 +99,41 @@ def _call_sync(key: str, message: str, state: dict | None, user_id: str) -> str:
     return text
 
 
+def is_rate_limit(e: BaseException) -> bool:
+    """Gemini on Vertex answers 429 RESOURCE_EXHAUSTED when shared model capacity is
+    momentarily short; that is worth a retry, any other error is not."""
+    msg = str(e)
+    return "RESOURCE_EXHAUSTED" in msg or "429" in msg
+
+
+_MAX_ATTEMPTS = 4
+
+
 async def run(key: str, message: str, state: dict | None = None,
               user_id: str = "remedy-mesh") -> str:
-    """Run one turn on a deployed agent and return its final text."""
-    t0 = time.monotonic()
-    ok = False
-    try:
-        out = await asyncio.to_thread(_call_sync, key, message, state, user_id)
-        ok = True
-        return out
-    finally:
-        dt = round(time.monotonic() - t0, 2)
-        STATS.append({"agent": key, "seconds": dt, "ok": ok, "at": time.time()})
-        del STATS[:-200]
-        _log.warning("agent-engine call %s %.2fs ok=%s", key, dt, ok)
+    """Run one turn on a deployed agent and return its final text. A rate-limited turn
+    is retried with backoff (2s, 4s, 8s + jitter); each attempt is a fresh session with
+    the same scoped state. Callers keep their own time budget around this."""
+    for attempt in range(1, _MAX_ATTEMPTS + 1):
+        t0 = time.monotonic()
+        ok = False
+        try:
+            out = await asyncio.to_thread(_call_sync, key, message, state, user_id)
+            ok = True
+            return out
+        except Exception as e:
+            if attempt == _MAX_ATTEMPTS or not is_rate_limit(e):
+                raise
+            wait = 2 ** attempt + random.random()
+            _log.warning("agent-engine %s rate-limited (attempt %d/%d) — retrying in %.1fs",
+                         key, attempt, _MAX_ATTEMPTS, wait)
+            await asyncio.sleep(wait)
+        finally:
+            dt = round(time.monotonic() - t0, 2)
+            STATS.append({"agent": key, "seconds": dt, "ok": ok, "at": time.time(),
+                          "attempt": attempt})
+            del STATS[:-200]
+            _log.warning("agent-engine call %s %.2fs ok=%s attempt=%d", key, dt, ok, attempt)
 
 
 def status() -> dict:

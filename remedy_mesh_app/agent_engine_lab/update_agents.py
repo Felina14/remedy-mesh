@@ -38,6 +38,7 @@ def main(keys: list[str]) -> None:
             requirements=["google-cloud-aiplatform[adk,agent_engines]", "google-adk==2.11.0",
                           "google-cloud-firestore>=2.16.0"],
             extra_packages=["remedy_mesh"],
+            gcs_dir_name=f"agent_engine_{key}",   # own staging folder, so updates can run in parallel
             display_name=name, description=desc,
             # REMEDY_BACKEND=firestore: the agent's tools read cases / complaints / suppliers /
             # policy live from Firestore instead of the bundled JSON.

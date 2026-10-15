@@ -22,7 +22,7 @@ from . import remote_agents
 
 # A remote (Agent Engine) turn adds a network round-trip; give it room so the real
 # agent answers instead of the run quietly falling back to the deterministic text.
-TURN_BUDGET_SECONDS = 20.0 if remote_agents.ENABLED else 8.0
+TURN_BUDGET_SECONDS = 35.0 if remote_agents.ENABLED else 8.0
 
 # Deterministic re-check interval per tag, in days — a concrete date gets computed
 # and guaranteed into the resolution text, never left to the model to invent.

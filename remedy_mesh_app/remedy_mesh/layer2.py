@@ -186,7 +186,7 @@ async def narrate_resource(ctx: dict, use_llm: bool = True) -> str:
             from .agent_runner import run_agent_text
             txt = await asyncio.wait_for(
                 run_agent_text(resource_agent, f"Facts: {json.dumps(ctx)}"),
-                timeout=20.0 if remote_agents.ENABLED else 8.0)
+                timeout=35.0 if remote_agents.ENABLED else 8.0)
             txt = (txt or "").strip()
             if len(txt) > 20:
                 return txt
