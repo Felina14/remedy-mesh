@@ -8,6 +8,7 @@
 
 **🔗 Live demo:** https://remedymesh-tl6pmvrlbq-uc.a.run.app
 **Sign in:** Analyst `eleanor` / `analyst123` · Approver `james` / `approve123`
+**📄 Solution document:** [Remedy-Mesh-Solution-Document.pdf](docs/Remedy-Mesh-Solution-Document.pdf)
 
 </div>
 
