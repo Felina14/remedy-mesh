@@ -112,7 +112,7 @@ service `remedy-mesh-hybrid`, which was then replaced by `remedymesh` (see 3.16)
     deployment with a Gemini mark, Firestore as the data source, Twilio and Gmail as external
     services. For slides and the video.
   - `docs/remedy-mesh-architecture.drawio` / `remedy-mesh-architecture-gcp.png`: detailed view
-    (every Cloud Run component, all 8 agents with their models, IAM, the build and deploy path,
+    (every Cloud Run component, all 8 agents with their models, IAM,
     the five-step case flow). For the README.
   - Connections are labelled with what is really used: the Vertex AI SDK (`stream_query`). No A2A
     or MCP is claimed because neither is used.
