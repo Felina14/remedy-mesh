@@ -15,17 +15,45 @@
 
 ## The problem
 
-A car recall is "closed" once the fix is in the market. But vehicles built **after** the recall's
-cutoff can carry the **same defect** — and because they were never in the recall, their owners are
-never told. The recall's scope has **drifted**, and nobody notices until field failures pile up.
+A car recall is "closed" once the fix is in the market. Two things can still go wrong, and both are
+usually discovered late, from field complaints rather than from analysis:
 
-This is real. Remedy Mesh is grounded on the actual NHTSA pattern behind campaign **24V-104** and
-its **26V-422 "fix-the-fix"** follow-up. (Names, VINs and the OEM here are fictional — the pattern
-and dates are real.)
+1. **The scope drifts.** Vehicles built outside the recall's production window carry the same
+   defect. They were never in the recall, so their owners are never told.
+2. **The fix fails.** The remedy that was applied does not hold, and "repaired" vehicles start
+   failing again: a *fix-the-fix*.
 
-Catching this today is slow and manual: someone has to notice the post-remedy failures, prove the
-new vehicles are genuinely out-of-scope, line up replacement parts across suppliers, and amend the
-federal recall filing. By the time that happens, more defective cars have shipped.
+Once either is spotted, the work is still manual and slow. Someone has to prove the new vehicles
+are affected, find replacement parts across suppliers under a cost ceiling, and amend the federal
+Part 573 recall filing. While parts are short, owners get "interim" letters that warn them of the
+risk without a fix. More defective vehicles stay on the road in the meantime.
+
+### This is happening now
+
+| Case | What happened | Source |
+|---|---|---|
+| **BMW integrated brake system** (supplier: Continental, now Aumovio) | US recall 24V-104 began in February 2024 at 79,670 vehicles. It grew to about **278,000 US vehicles** (24V-104 now covers 266,716, plus 24V-739 at 11,579), and in September 2024 BMW recalled about **1.5 million vehicles worldwide**. In 2026, recall **26V-422** states: *"Vehicles previously repaired under recall 24V739 or 24V104 will need to have the new remedy completed."* The fix itself had to be redone. | NHTSA recalls [24V-104](https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=24V104), [24V-739](https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=24V739), [26V-422](https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=26V422); [S&P Global](https://www.spglobal.com/automotive-insights/en/blogs/2024/10/bmw-hits-the-brakes-with-vehicle-recall); [Manufacturing.net](https://www.manufacturing.net/operations/news/22920068/bmw-cuts-outlook-after-braking-system-recall-hits-15-million-cars) |
+| **Parts shortages leave owners waiting** | For 24V-739, BMW mailed *interim* letters warning owners of the risk; *"second letters will be mailed once the parts are available."* | NHTSA recall [24V-739](https://api.nhtsa.gov/recalls/campaignNumber?campaignNumber=24V739) |
+| **The cost is real** | On July 30, 2026, Aumovio agreed to pay BMW **€350 million** to settle the dispute over the defective brake system. | [Gleiss Lutz](https://www.gleisslutz.com/en/mandates-firm-news/gleiss-lutz-advises-aumovio-eur-350-million-settlement-and-billion-euro-technology-partnership-bmw); [Baker McKenzie](https://www.bakermckenzie.com/en/newsroom/2026/08/bmw) |
+| **GM 6.2L L87 V8** | The remedy for recall 25V-274 was largely a change to thicker engine oil. NHTSA then received **499 complaints of engine failure after the remedy was completed**, and on August 20, 2026 it opened Engineering Analysis **EA26005** covering **997,743 vehicles**. (That is an investigation, not a new recall.) | [GM Authority](https://gmauthority.com/blog/2026/08/gm-6-2l-l87-engine-post-recall-failures-piling-up-nhtsa-investigation-shows/); [TruckDaily](https://truckdaily.com/nhtsa-ea26005-gm-62-l87/) |
+| **Scope found after the fact** | In BMW's i4 frame recall 24V-611, BMW's own filing says the suspect part *"had been produced outside of the previously identified suspect production range"* and that *"the previously identified containment range needed to be expanded."* | BMW Part 573 report, [24V-611](https://static.nhtsa.gov/odi/rcl/2024/RCLRPT-24V611-6291.PDF) |
+
+Two manufacturers, two years, the same pattern: a remedy shipped, then new complaints showed the
+scope or the fix was not enough.
+
+### What Remedy Mesh claims
+
+- **Detect it from the evidence, early.** Re-check closed recalls against new complaints, production
+  lots and remedy dates, and flag scope drift or a failing remedy with the exact rule that fired.
+- **Never guess.** The verdict is deterministic policy. Gemini agents interpret, investigate and
+  independently verify, and a missing record is chased rather than assumed.
+- **Shorten the gap to a fix.** Once confirmed, source replacement parts from pre-qualified
+  suppliers under a cost ceiling, confirm each one on a real phone call, and draft the Part 573
+  amendment.
+- **Keep humans in charge.** Every purchase order and filing is a draft until an Approver signs off.
+
+Remedy Mesh's hero case is modelled on the BMW brake pattern above. Names, VINs and the OEM in the
+app are fictional, and the case data is synthetic. The pattern is real.
 
 ## The idea
 
@@ -80,6 +108,23 @@ Two human roles wrap the whole thing (a real **maker-checker** separation of dut
   Analyst's job, and vice-versa (enforced server-side). Once a case is run, the Approver sees an
   exact **replay** of the Analyst's run — nothing re-runs.
 
+## Architecture on Google Cloud
+
+![Remedy Mesh architecture: Cloud Run app calling 8 ADK agents on Vertex AI Agent Engine, with case data in Firestore](docs/remedy-mesh-agent-engine.png)
+
+- **Cloud Run** hosts the web app, the deterministic orchestrator (verdicts, allocation under the
+  price ceiling, the commitment ledger), the approval workflow and the Twilio voice webhook.
+- **Vertex AI Agent Engine** runs the **8 Google ADK agents**, each as its own managed service.
+  Cloud Run calls them through the Vertex AI SDK (`stream_query`); the Supplier Offer Agent runs
+  once per supplier in an isolated session.
+- **Gemini 2.5 on Vertex AI**: Flash for interpretation and negotiation, Pro for investigation and
+  verification.
+- **Firestore** holds the case data the agents read (complaints, production lots, campaigns,
+  suppliers, policy rules).
+
+Detailed view, with every component and agent: [`docs/remedy-mesh-architecture-gcp.png`](docs/remedy-mesh-architecture-gcp.png).
+Both diagrams are editable in draw.io (`docs/*.drawio`).
+
 ## What makes it distinctive
 
 **The negotiation mesh.** The core agentic pattern — each supplier bargaining in an *isolated*
@@ -114,11 +159,12 @@ orders **and** the regulator-side Part 573 recall amendment — each through the
 
 | | |
 |---|---|
-| **AI** | Google ADK (`LlmAgent` + FunctionTools), Gemini 2.5 Flash on **Vertex AI** (ADC — no API key) |
+| **AI** | Google ADK (`LlmAgent` + FunctionTools), 8 agents on **Vertex AI Agent Engine**, Gemini 2.5 Flash + Pro on **Vertex AI** (ADC — no API key) |
+| **Data** | Firestore (Native mode): the case data the agents read |
 | **Backend** | Python, FastAPI, Uvicorn, ReportLab (PDFs), Server-Sent Events |
 | **Telephony / email** | Twilio Programmable Voice · Gmail SMTP |
 | **Frontend** | Vanilla HTML/CSS/JS single-page app (no build step) |
-| **Deploy** | Google Cloud Run (single container: SPA + API + webhook, one origin) |
+| **Deploy** | Google Cloud Run (SPA + API + orchestrator + webhook, one origin) · agents deployed separately on Agent Engine |
 
 ## Running it locally
 
